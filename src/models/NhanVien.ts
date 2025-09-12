@@ -1,27 +1,16 @@
 import mongoose, { Document, Schema } from "mongoose";
 import bcrypt from "bcryptjs";
 
-import type { IDocGia } from "../types/doc-gia.ts";
+import type { INhanVien } from "../types/nhan-vien.ts";
 
-const DocGiaSchema = new Schema<IDocGia>(
+const NhanVienSchema = new Schema<INhanVien>(
   {
-    firstname: { type: String, required: true, unique: true },
-    lastname: { type: String, required: true },
-    gender: {
+    fullname: { type: String, required: true },
+    duty: {
       type: String,
       required: true,
-      enum: ["male", "female", "other"],
-      default: "other",
-    },
-    dateOfBirth: {
-      type: Date,
-      required: true,
-      validate: {
-        validator: function (v: Date) {
-          return v <= new Date();
-        },
-        message: "Date of birth cannot be in the future",
-      },
+      enum: ["staff", "manager"],
+      default: "staff",
     },
     phoneNumber: {
       type: String,
@@ -54,7 +43,7 @@ const DocGiaSchema = new Schema<IDocGia>(
   { timestamps: true }
 );
 
-DocGiaSchema.methods.comparePassword = function (
+NhanVienSchema.methods.comparePassword = function (
   password = ""
 ): Promise<boolean> {
   console.log(this.passwordHash);
@@ -64,4 +53,4 @@ DocGiaSchema.methods.comparePassword = function (
   return bcrypt.compare(password, this.passwordHash);
 };
 
-export default mongoose.model("DocGia", DocGiaSchema);
+export default mongoose.model("NhanVien", NhanVienSchema);

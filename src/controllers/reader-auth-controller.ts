@@ -14,32 +14,11 @@ import {
   createErrorResponse,
 } from "../utils/response.ts";
 
-interface JWTPayload {
-  sub: string;
-  email: string;
-  firstname: string;
-  lastname: string;
-}
-
-interface LoginRequest extends Request {
-  body: {
-    email: string;
-    password: string;
-  };
-}
-
-interface RegisterRequest extends Request {
-  body: {
-    firstname: string;
-    lastname: string;
-    gender: "male" | "female" | "other";
-    dateOfBirth: string;
-    phoneNumber: string;
-    email: string;
-    password: string;
-    address: string;
-  };
-}
+import type {
+  ReaderJWTPayload,
+  LoginRequest,
+  ReaderRegisterRequest,
+} from "../types/request.ts";
 
 interface MongooseValidationError extends Error {
   name: "ValidationError";
@@ -54,7 +33,7 @@ interface MongooseValidationError extends Error {
 }
 
 const signUser = (user: IDocGiaWithId): string => {
-  const payload: JWTPayload = {
+  const payload: ReaderJWTPayload = {
     sub: user._id.toString(),
     email: user.email,
     firstname: user.firstname,
@@ -113,7 +92,11 @@ class AuthController {
     }
   }
 
-  async register(req: RegisterRequest, res: Response, next: NextFunction) {
+  async register(
+    req: ReaderRegisterRequest,
+    res: Response,
+    next: NextFunction
+  ) {
     try {
       const { password, ...payload } = req.body;
 
@@ -189,7 +172,9 @@ class AuthController {
     }
   }
 
-  // async logout(req, res, next) {}
+  logout(req: Request, res: Response, next: NextFunction) {
+    return res.status(200).json({ message: "Đăng xuất thành công." });
+  }
 }
 
 export default new AuthController();
