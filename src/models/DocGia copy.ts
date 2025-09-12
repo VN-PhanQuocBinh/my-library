@@ -1,9 +1,9 @@
-const mongoose = require("mongoose");
-const Schema = mongoose.Schema;
+import mongoose, { Document, Schema } from "mongoose";
+import bcrypt from "bcryptjs";
 
-const bcrypt = require("bcryptjs");
+import type { IDocGia } from "../types/doc-gia.ts";
 
-const DocGiaSchema = new Schema(
+const DocGiaSchema = new Schema<IDocGia>(
   {
     firstname: { type: String, required: true, unique: true },
     lastname: { type: String, required: true },
@@ -17,7 +17,7 @@ const DocGiaSchema = new Schema(
       type: Date,
       required: true,
       validate: {
-        validator: function (v) {
+        validator: function (v: Date) {
           return v <= new Date();
         },
         message: "Date of birth cannot be in the future",
@@ -27,7 +27,7 @@ const DocGiaSchema = new Schema(
       type: String,
       required: true,
       validate: {
-        validator: function (v) {
+        validator: function (v: string) {
           return /^[0-9]{10,11}$/.test(v);
         },
         message: "Phone number must be 10-11 digits",
@@ -39,13 +39,13 @@ const DocGiaSchema = new Schema(
       unique: true,
       lowercase: true,
       validate: {
-        validator: function (v) {
+        validator: function (v: string) {
           return /^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/.test(v);
         },
         message: "Please enter a valid email",
       },
     },
-    passwordHash: { type: String, required: true },
+    passwordHash: { type: String, required: true, select: false },
     address: {
       type: String,
       required: true,
@@ -54,8 +54,14 @@ const DocGiaSchema = new Schema(
   { timestamps: true }
 );
 
-DocGiaSchema.methods.comparePassword = (passwrord) => {
-  return bcrypt.compare(passwrord, this.passwordHash);
+DocGiaSchema.methods.comparePassword = function (
+  password = ""
+): Promise<boolean> {
+  console.log(this.passwordHash);
+  if (!this.passwordHash) {
+    throw new Error("Password hash is missing");
+  }
+  return bcrypt.compare(password, this.passwordHash);
 };
 
-module.exports = mongoose.model("DocGia", DocGiaSchema);
+export default mongoose.model("DocGia", DocGiaSchema);
