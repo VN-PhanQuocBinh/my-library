@@ -1,4 +1,4 @@
-import mongoose, { Document, Schema } from "mongoose";
+import mongoose, { Schema } from "mongoose";
 import bcrypt from "bcryptjs";
 
 import type { INhanVien } from "../types/nhan-vien.ts";
@@ -46,7 +46,6 @@ const NhanVienSchema = new Schema<INhanVien>(
 NhanVienSchema.methods.comparePassword = function (
   password = ""
 ): Promise<boolean> {
-  console.log(this.passwordHash);
   if (!this.passwordHash) {
     throw new Error("Password hash is missing");
   }

@@ -43,7 +43,7 @@ const signUser = (user: IDocGiaWithId): string => {
   return jwt.sign(payload, JWT_SECRET, { expiresIn: "1 day" });
 };
 
-class AuthController {
+class UserAuthController {
   async login(req: LoginRequest, res: Response, next: NextFunction) {
     try {
       const { email, password } = req.body;
@@ -77,7 +77,7 @@ class AuthController {
         createSuccessResponse({
           message: "Login successfully",
           data: {
-            access_token: token,
+            accessToken: token,
             user: userResponse,
           },
         })
@@ -177,4 +177,4 @@ class AuthController {
   }
 }
 
-export default new AuthController();
+export default new UserAuthController();

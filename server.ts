@@ -1,12 +1,10 @@
 import type { Request, Response } from "express";
 
 import express from "express";
+import cors from "cors";
 import dotenv from "dotenv";
-// const express = require("express");
-// const dotenv = require("dotenv");
 
 // connect to database
-// const db = require("./src/config/db");
 import db from "./src/config/db.ts";
 db.connect();
 
@@ -16,12 +14,18 @@ const PORT = process.env.PORT || 5000;
 
 const app = express();
 
+// enable CORS
+app.use(
+  cors({
+    origin: "http://localhost:5173", // allow requests from this origin
+  })
+);
+
 // Parse URL-encoded bodies (as sent by HTML forms)
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 // define router
-// const route = require("./src/routes");
 import route from "./src/routes/index.ts";
 route(app);
 

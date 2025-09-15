@@ -1,8 +1,7 @@
 import type { Request, Response, NextFunction } from "express";
 import jwt from "jsonwebtoken";
 import bcrypt from "bcryptjs";
-import DocGia from "../models/DocGia.ts";
-import type { IDocGiaWithId } from "../types/doc-gia.ts";
+import NhanVien from "../models/NhanVien.ts";
 import { Error } from "mongoose";
 
 const JWT_SECRET = process.env.JWT_SECRET || "dev_secret";
@@ -20,6 +19,7 @@ import type {
   StaffRegisterRequest,
 } from "../types/request.ts";
 import type { INhanVienWithId } from "../types/nhan-vien.ts";
+import { create } from "domain";
 
 interface MongooseValidationError extends Error {
   name: "ValidationError";
@@ -43,17 +43,23 @@ const signUser = (user: INhanVienWithId): string => {
   return jwt.sign(payload, JWT_SECRET, { expiresIn: "1 day" });
 };
 
-class AuthController {
+class AdminAuthController {
   async login(req: LoginRequest, res: Response, next: NextFunction) {
     try {
       const { email, password } = req.body;
-      const user = await DocGia.findOne({ email }).select("+passwordHash");
+      if (!email) {
+        return res
+          .status(400)
+          .json(createErrorResponse({ message: "Email is required", statusCode: 400 }));
+      }
+
+      const user = await NhanVien.findOne({ email }).select("+passwordHash");
 
       if (!user) {
         const code = 400;
         return res.status(code).json(
           createErrorResponse({
-            message: "Fail to login",
+            message: "Email does not exist",
             statusCode: code,
           })
         );
@@ -64,7 +70,7 @@ class AuthController {
         const code = 401;
         return res.status(code).json(
           createErrorResponse({
-            message: "Fail to login",
+            message: "Password is not correct",
             statusCode: code,
           })
         );
@@ -97,7 +103,7 @@ class AuthController {
       const { password, ...payload } = req.body;
 
       // Check email exists
-      const isExist = await DocGia.findOne({ email: payload.email });
+      const isExist = await NhanVien.findOne({ email: payload.email });
 
       if (isExist) {
         return res.status(400).json({
@@ -107,7 +113,7 @@ class AuthController {
       }
 
       const passwordHash = await bcrypt.hash(password, 10);
-      const user = await DocGia.create({ ...payload, passwordHash });
+      const user = await NhanVien.create({ ...payload, passwordHash });
       const token = signUser(user as any);
 
       const userResponse = formatUserResponse(user as any);
@@ -173,4 +179,4 @@ class AuthController {
   }
 }
 
-export default new AuthController();
+export default new AdminAuthController();
