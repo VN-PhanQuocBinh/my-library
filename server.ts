@@ -1,8 +1,10 @@
 import type { Request, Response } from "express";
+import mongoose from "mongoose";
 
 import express from "express";
 import cors from "cors";
 import dotenv from "dotenv";
+
 
 // connect to database
 import db from "./src/config/db.ts";
@@ -26,8 +28,8 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 // define router
-import route from "./src/routes/index.ts";
-route(app);
+import routes from "./src/routes/index.ts";
+routes(app);
 
 app.get("/", (req: Request, res: Response) => res.send("API is running..."));
 

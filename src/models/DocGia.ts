@@ -64,4 +64,4 @@ DocGiaSchema.methods.comparePassword = function (
   return bcrypt.compare(password, this.passwordHash);
 };
 
-export default mongoose.model("DocGia", DocGiaSchema);
+export default mongoose.model("DocGia", DocGiaSchema, "DocGia");

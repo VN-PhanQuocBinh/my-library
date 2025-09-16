@@ -1,0 +1,99 @@
+import NhaXuatBan from "../models/NhaXuatBan.ts";
+import type { Request, Response } from "express";
+import type { INhaXuatBan } from "../types/nha-xuat-ban.ts";
+import pagnigate from "../utils/pagnigate.ts";
+
+import {
+  generateSuccessResponse,
+  generateErrorResponse,
+} from "../utils/response.ts";
+
+interface PublisherRequest extends Request {
+  body: Pick<INhaXuatBan, "name" | "address">;
+}
+
+class PublisherController {
+  createPublisher = async (
+    req: PublisherRequest,
+    res: Response
+  ): Promise<any> => {
+    try {
+      const { name, address } = req.body;
+      const newPublisher = new NhaXuatBan({ name, address });
+      await newPublisher.save();
+
+      return generateSuccessResponse({
+        res,
+        message: "Publisher created successfully",
+        data: newPublisher,
+        statusCode: 201,
+      });
+    } catch (error: unknown) {
+      const errorMessage =
+        error instanceof Error ? error.message : "An unknown error occurred";
+      return generateErrorResponse({
+        res,
+        message: "Failed to create publisher",
+        errorDetails: errorMessage,
+      });
+    }
+  };
+
+  getAllPublishers = async (req: Request, res: Response): Promise<any> => {
+    try {
+      const publishers = await pagnigate<INhaXuatBan>(req, NhaXuatBan);
+      return generateSuccessResponse({
+        res,
+        message: "Publishers retrieved successfully",
+        data: publishers,
+      });
+    } catch (error: unknown) {
+      const errorMessage =
+        error instanceof Error ? error.message : "An unknown error occurred";
+      return generateErrorResponse({
+        res,
+        message: "Failed to retrieve publishers",
+        errorDetails: errorMessage,
+      });
+    }
+  };
+
+  updatePublisher = async (req: Request, res: Response): Promise<any> => {
+    try {
+      const { id } = req.params;
+      const { name, address } = req.body;
+
+      const updatedPublisher = await NhaXuatBan.findByIdAndUpdate(
+        id,
+        { name, address },
+        { new: true, runValidators: true }
+      );
+
+      if (!updatedPublisher) {
+        return generateErrorResponse({
+          res,
+          message: "Publisher not found",
+          errorDetails: "No publisher found with the provided ID",
+          statusCode: 404,
+        });
+      }
+
+      return generateSuccessResponse({
+        res,
+        message: "Publisher updated successfully",
+        data: updatedPublisher,
+      });
+      
+    } catch (error: unknown) {
+      const errorMessage =
+        error instanceof Error ? error.message : "An unknown error occurred";
+      return generateErrorResponse({
+        res,
+        message: "Failed to update publisher",
+        errorDetails: errorMessage,
+      });
+    }
+  };
+}
+
+export default new PublisherController();

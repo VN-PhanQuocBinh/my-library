@@ -52,4 +52,4 @@ NhanVienSchema.methods.comparePassword = function (
   return bcrypt.compare(password, this.passwordHash);
 };
 
-export default mongoose.model("NhanVien", NhanVienSchema);
+export default mongoose.model("NhanVien", NhanVienSchema, "NhanVien");
