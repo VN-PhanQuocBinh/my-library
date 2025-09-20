@@ -11,7 +11,7 @@ import {
   formatUserResponse,
   createSuccessResponse,
   createErrorResponse,
-  generateSuccessResponse
+  generateSuccessResponse,
 } from "../utils/response.ts";
 
 import type {
@@ -51,7 +51,12 @@ class AdminAuthController {
       if (!email) {
         return res
           .status(400)
-          .json(createErrorResponse({ message: "Email is required", statusCode: 400 }));
+          .json(
+            createErrorResponse({
+              message: "Email is required",
+              statusCode: 400,
+            })
+          );
       }
 
       const user = await NhanVien.findOne({ email }).select("+passwordHash");
@@ -84,7 +89,7 @@ class AdminAuthController {
         createSuccessResponse({
           message: "Login successfully",
           data: {
-            access_token: token,
+            accessToken: token,
             user: userResponse,
           },
         })
@@ -129,6 +134,7 @@ class AdminAuthController {
         })
       );
     } catch (error: unknown) {
+      console.error("Register error:", error); 
       if (
         error &&
         typeof error === "object" &&

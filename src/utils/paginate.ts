@@ -8,17 +8,17 @@ interface PaginationResult {
   totalPages: number;
 }
 
-interface PagnigateResponse<T> {
+interface PaginateResponse<T> {
   list: T[];
-  pagniation: PaginationResult;
+  pagination: PaginationResult;
 }
 
-const pagnigate = async <T = any>(
+const paginate = async <T = any>(
   req: Request,
   Model: mongoose.Model<T>,
   populate: string | string[] = "",
   options: mongoose.QueryOptions = {}
-): Promise<PagnigateResponse<T>> => {
+): Promise<PaginateResponse<T>> => {
   try {
     const page = parseInt(req.query.page as string, 10) || 0;
     const limit = parseInt(req.query.limit as string, 10) || 10;
@@ -32,7 +32,7 @@ const pagnigate = async <T = any>(
       .populate(populate)
       .lean<T[]>(); // Thêm .lean() để trả về plain object thay vì Mongoose document
 
-    const pagniation = {
+    const pagination = {
       page,
       limit,
       total: totalCount,
@@ -41,7 +41,7 @@ const pagnigate = async <T = any>(
 
     return {
       list,
-      pagniation,
+      pagination,
     };
   } catch (error) {
     const errorMessage =
@@ -50,4 +50,4 @@ const pagnigate = async <T = any>(
   }
 };
 
-export default pagnigate;
+export default paginate;

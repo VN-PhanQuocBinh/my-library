@@ -11,7 +11,7 @@ import {
 } from "../utils/response.ts";
 
 import type { ISach } from "../types/sach.ts";
-import pagnigate from "../utils/pagnigate.ts";
+import pagnigate from "../utils/paginate.ts";
 
 interface BookCreateRequest extends Request {
   body: Partial<ISach>;

@@ -1,7 +1,7 @@
 import NhaXuatBan from "../models/NhaXuatBan.ts";
 import type { Request, Response } from "express";
 import type { INhaXuatBan } from "../types/nha-xuat-ban.ts";
-import pagnigate from "../utils/pagnigate.ts";
+import pagnigate from "../utils/paginate.ts";
 
 import {
   generateSuccessResponse,
