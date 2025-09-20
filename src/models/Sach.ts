@@ -71,8 +71,9 @@ const sachSchema = new mongoose.Schema<ISach>({
   coverImage: {
     type: String,
     trim: true,
+    default: null
   },
-  images: [
+  detailedImages: [
     {
       type: String,
       trim: true,

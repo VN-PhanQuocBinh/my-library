@@ -4,13 +4,22 @@ import mongoose from "mongoose";
 import express from "express";
 import cors from "cors";
 import dotenv from "dotenv";
+import { v2 as cloudinary } from "cloudinary";
 
+// load environment variables from .env file
+dotenv.config();
+
+// configure cloudinary
+cloudinary.config({
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+  api_key: process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET,
+});
 
 // connect to database
 import db from "./src/config/db.ts";
 db.connect();
 
-dotenv.config();
 
 const PORT = process.env.PORT || 5000;
 

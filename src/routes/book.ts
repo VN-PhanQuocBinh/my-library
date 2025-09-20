@@ -1,14 +1,14 @@
 import express from "express";
-import BookController from "../controllers/book-controller.ts";
-import multer from "multer";
+import BookController, { upload } from "../controllers/book-controller.ts";
 
 const router = express.Router();
 
-const upload = multer({ dest: "uploads/" });
-
 router.post(
   "/create",
-  upload.array("detailedImages", 5),
+  upload.fields([
+    { name: "coverImage", maxCount: 1 },
+    { name: "detailedImages", maxCount: 10 },
+  ]),
   BookController.createBook as express.RequestHandler
 );
 router.get("/list", BookController.getAllBooks);

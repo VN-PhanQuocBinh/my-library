@@ -1,6 +1,9 @@
 import Sach from "../models/Sach.ts";
 import NhaXuatBan from "../models/NhaXuatBan.ts";
 import type { Request, Response } from "express";
+import multer from "multer";
+import uploadImages from "../utils/upload-images.ts";
+import { IMAGE_UPLOAD_PATH } from "../config/config.ts";
 
 import {
   generateErrorResponse,
@@ -12,18 +15,42 @@ import pagnigate from "../utils/pagnigate.ts";
 
 interface BookCreateRequest extends Request {
   body: Partial<ISach>;
-  file?: Express.Multer.File;
-  // files?: { [fieldname: string]: Express.Multer.File[] };
-  files?: any[];
+  // file?: Express.Multer.File;
+  files?: Record<string, Express.Multer.File[]>;
 }
 
+// Configure multer for file uploads
+export const upload = multer({ dest: "uploads/" });
+
+// Define paths for image uploads
+const COVER_IMAGES_PATH =
+  IMAGE_UPLOAD_PATH.BOOK.COVER_IMAGE || "book/images/covers";
+const DETAILED_IMAGES_PATH =
+  IMAGE_UPLOAD_PATH.BOOK.DETAILED_IMAGE || "book/images/details";
+
+
+// Book Controller
 class BookController {
   createBook = async (req: BookCreateRequest, res: Response): Promise<any> => {
     try {
       const payload = req.body;
-      console.log(req.files);
-      return res.json({message: "ok"})
+
+      if (payload.price && typeof payload.price === "string") {
+        payload.price = JSON.parse(payload.price);
+      }
+
+      // console.log("Payload:", payload);
       // console.log(req.files);
+      // return res.json({ message: "ok" });
+
+      if (!req.files) {
+        return generateErrorResponse({
+          res,
+          message: "No files uploaded",
+          errorDetails: null,
+          statusCode: 400,
+        });
+      }
 
       const existingPublisher = await NhaXuatBan.findById(payload.publisher);
       if (!existingPublisher) {
@@ -33,6 +60,25 @@ class BookController {
           errorDetails: null,
           statusCode: 400,
         });
+      }
+
+      // Handle file uploads
+      const { coverImage, detailedImages } = req.files;
+      if (coverImage && coverImage.length > 0 && coverImage[0]) {
+        const coverImageUpload = await uploadImages(
+          coverImage[0].path,
+          COVER_IMAGES_PATH
+        );
+        payload.coverImage = coverImageUpload.secure_url;
+      }
+
+      if (detailedImages && detailedImages.length > 0) {
+        const imageUploadPromises = detailedImages.map((image) =>
+          uploadImages(image.path, DETAILED_IMAGES_PATH)
+        );
+
+        const uploadedImages = await Promise.all(imageUploadPromises);
+        payload.detailedImages = uploadedImages.map((img) => img.secure_url);
       }
 
       const newBook = new Sach(payload);
