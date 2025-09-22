@@ -20,14 +20,13 @@ interface BookCreateRequest extends Request {
 }
 
 // Configure multer for file uploads
-export const upload = multer({ dest: "uploads/" });
+export const upload = multer();
 
 // Define paths for image uploads
 const COVER_IMAGES_PATH =
   IMAGE_UPLOAD_PATH.BOOK.COVER_IMAGE || "book/images/covers";
 const DETAILED_IMAGES_PATH =
   IMAGE_UPLOAD_PATH.BOOK.DETAILED_IMAGE || "book/images/details";
-
 
 // Book Controller
 class BookController {
@@ -65,8 +64,8 @@ class BookController {
       // Handle file uploads
       const { coverImage, detailedImages } = req.files;
       if (coverImage && coverImage.length > 0 && coverImage[0]) {
-        const coverImageUpload = await uploadImages(
-          coverImage[0].path,
+        const coverImageUpload: any = await uploadImages(
+          coverImage[0].buffer,
           COVER_IMAGES_PATH
         );
         payload.coverImage = coverImageUpload.secure_url;
@@ -74,11 +73,13 @@ class BookController {
 
       if (detailedImages && detailedImages.length > 0) {
         const imageUploadPromises = detailedImages.map((image) =>
-          uploadImages(image.path, DETAILED_IMAGES_PATH)
+          uploadImages(image.buffer, DETAILED_IMAGES_PATH)
         );
 
         const uploadedImages = await Promise.all(imageUploadPromises);
-        payload.detailedImages = uploadedImages.map((img) => img.secure_url);
+        payload.detailedImages = uploadedImages.map(
+          (img: any) => img.secure_url
+        );
       }
 
       const newBook = new Sach(payload);
