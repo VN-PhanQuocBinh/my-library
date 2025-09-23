@@ -84,6 +84,7 @@ interface ErrorArgs {
   res: Response;
   message: string;
   errorDetails: any;
+  data?: any;
   statusCode?: number;
 }
 
@@ -106,13 +107,14 @@ export const generateErrorResponse = ({
   res,
   message,
   errorDetails,
+  data = null,
   statusCode = 500,
 }: ErrorArgs): Response<ErrorResponse> => {
   const response: ErrorResponse = {
     success: false,
     status: statusCode,
     message,
-    data: null,
+    data,
     timestamp: new Date().toISOString(),
   };
 

@@ -102,7 +102,25 @@ class BookController {
 
   getAllBooks = async (req: Request, res: Response): Promise<any> => {
     try {
-      const booksResult = await pagnigate<ISach>(req, Sach, "publisher", {});
+      const { query } = req.query;
+      let searchOption = {};
+
+      if (query) {
+        const regex = new RegExp(String(query), "i");
+        searchOption = {
+          $or: [
+            { name: { $regex: regex } },
+            { author: { $regex: regex } },
+            { genre: { $regex: regex } },
+          ],
+        };
+      }
+      const booksResult = await pagnigate<ISach>(
+        req,
+        Sach,
+        "publisher",
+        searchOption
+      );
       return generateSuccessResponse({
         res,
         message: "Books retrieved successfully",
@@ -121,18 +139,22 @@ class BookController {
   updateBook = async (req: Request, res: Response): Promise<any> => {
     try {
       const bookId = req.params.id;
-      const { name, price, quantity, publisher } = req.body;
+      const payload = req.body;
 
-      const updatedBook = await Sach.findByIdAndUpdate(
-        bookId,
-        { name, price, quantity, publisher },
-        { new: true, runValidators: true }
-      );
+      if (payload.price && typeof payload.price === "string") {
+        payload.price = JSON.parse(payload.price);
+      }
+
+      const updatedBook = await Sach.findByIdAndUpdate(bookId, payload, {
+        new: true,
+        runValidators: true,
+      });
 
       if (!updatedBook) {
         return generateErrorResponse({
           res,
           message: "Book not found",
+          data: payload,
           errorDetails: null,
           statusCode: 404,
         });
@@ -148,40 +170,7 @@ class BookController {
         res,
         message: "Failed to update book",
         errorDetails: error,
-        statusCode: 500,
-      });
-    }
-  };
-
-  deleteBook = async (req: Request, res: Response): Promise<any> => {
-    try {
-      const bookId = req.params.id;
-
-      const deletedBook = await Sach.findByIdAndUpdate(
-        bookId,
-        { status: false },
-        { new: true }
-      );
-
-      if (!deletedBook) {
-        return generateErrorResponse({
-          res,
-          message: "Book not found",
-          errorDetails: null,
-          statusCode: 404,
-        });
-      }
-
-      return generateSuccessResponse({
-        res,
-        message: "Book deleted successfully",
-        data: deletedBook,
-      });
-    } catch (error) {
-      return generateErrorResponse({
-        res,
-        message: "Failed to delete book",
-        errorDetails: error,
+        data: req.body,
         statusCode: 500,
       });
     }

@@ -1,10 +1,8 @@
 import type { Request, Response } from "express";
-import mongoose from "mongoose";
 
 import express from "express";
 import cors from "cors";
 import dotenv from "dotenv";
-import { v2 as cloudinary } from "cloudinary";
 
 // load environment variables from .env file
 dotenv.config();

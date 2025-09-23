@@ -12,8 +12,14 @@ router.post(
   BookController.createBook as express.RequestHandler
 );
 router.get("/list", BookController.getAllBooks);
-router.patch("/:id/update", BookController.updateBook);
-router.delete("/:id/delete", BookController.deleteBook);
+router.patch(
+  "/:id/update",
+  upload.fields([
+    { name: "coverImage", maxCount: 1 },
+    { name: "detailedImages", maxCount: 10 },
+  ]),
+  BookController.updateBook
+);
 router.get("/:id", BookController.getBookById);
 
 export default router;

@@ -81,6 +81,8 @@ const sachSchema = new mongoose.Schema<ISach>({
   ],
 });
 
+sachSchema.index({ name: "text", author: "text", genre: "text" });
+
 sachSchema.pre("save", async function (next) {
   if (this.isModified("name")) {
     let newSlug: string = slugify(this.name, {
