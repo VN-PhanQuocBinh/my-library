@@ -102,8 +102,8 @@ class BookController {
 
   getAllBooks = async (req: Request, res: Response): Promise<any> => {
     try {
-      const { query } = req.query;
-      let searchOption = {};
+      const { query, publisher } = req.query;
+      let searchOption: any = {};
 
       if (query) {
         const regex = new RegExp(String(query), "i");
@@ -115,6 +115,11 @@ class BookController {
           ],
         };
       }
+
+      if (publisher) {
+        searchOption.publisher = publisher;
+      }
+
       const booksResult = await pagnigate<ISach>(
         req,
         Sach,
@@ -141,7 +146,9 @@ class BookController {
       const bookId = req.params.id;
       const payload = req.body;
 
-      if (payload.price && typeof payload.price === "string") {
+      console.log(payload);
+
+      if (payload?.price && typeof payload.price === "string") {
         payload.price = JSON.parse(payload.price);
       }
 
