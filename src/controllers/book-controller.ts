@@ -102,7 +102,7 @@ class BookController {
 
   getAllBooks = async (req: Request, res: Response): Promise<any> => {
     try {
-      const { query, publisher } = req.query;
+      const { query, publisher, genre, status } = req.query;
       let searchOption: any = {};
 
       if (query) {
@@ -118,6 +118,18 @@ class BookController {
 
       if (publisher) {
         searchOption.publisher = publisher;
+      }
+
+      if (genre) {
+        searchOption.genre = genre;
+      }
+
+      if (status) {
+        if (status === "true") {
+          searchOption.status = true;
+        } else if (status === "false") {
+          searchOption.status = false;
+        }
       }
 
       const booksResult = await pagnigate<ISach>(
