@@ -1,7 +1,12 @@
 import express from "express";
 import BookController, { upload } from "../controllers/book-controller.ts";
+import bookBorrowigController from "../controllers/book-borrowig-controller.ts";
 
 const router = express.Router();
+
+router.get("/borrowings", bookBorrowigController.getAllBorrowings);
+router.post("/borrow", bookBorrowigController.borrowBook);
+router.patch("/borrow/:id", bookBorrowigController.updateBorrowing);
 
 router.post(
   "/create",
@@ -21,5 +26,6 @@ router.patch(
   BookController.updateBook
 );
 router.get("/:id", BookController.getBookById);
+router.post("/return/:id", bookBorrowigController.returnBook);
 
 export default router;

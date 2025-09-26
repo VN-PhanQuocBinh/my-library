@@ -3,6 +3,7 @@ import mongoose from "mongoose";
 import slugify from "slugify";
 import type { ISach } from "../types/sach.ts";
 import { GENRES } from "../types/sach.ts";
+import { normalizeVietnamese } from "../utils/normalize-vietnamese.ts";
 
 const sachSchema = new mongoose.Schema<ISach>({
   name: {
@@ -10,6 +11,9 @@ const sachSchema = new mongoose.Schema<ISach>({
     required: true,
     trim: true,
     maxlength: 100,
+  },
+  normalizedName: {
+    type: String,
   },
   description: {
     type: String,
@@ -42,10 +46,18 @@ const sachSchema = new mongoose.Schema<ISach>({
     type: String,
     required: true,
   },
+  normalizedAuthor: {
+    type: String,
+    lowercase: true,
+  },
   genre: {
     type: String,
     enum: GENRES,
     trim: true,
+    lowercase: true,
+  },
+  normalizedGenre: {
+    type: String,
     lowercase: true,
   },
   pages: {
@@ -71,7 +83,7 @@ const sachSchema = new mongoose.Schema<ISach>({
   coverImage: {
     type: String,
     trim: true,
-    default: null
+    default: null,
   },
   detailedImages: [
     {
@@ -81,7 +93,7 @@ const sachSchema = new mongoose.Schema<ISach>({
   ],
 });
 
-sachSchema.index({ name: "text", author: "text", genre: "text" });
+sachSchema.index({ normalizedName: "text", normalizedAuthor: "text", normalizedGenre: "text" });
 
 sachSchema.pre("save", async function (next) {
   if (this.isModified("name")) {
@@ -102,6 +114,39 @@ sachSchema.pre("save", async function (next) {
 
     this.slug = newSlug;
   }
+  next();
+});
+
+sachSchema.pre("save", function (next) {
+  if (this.isModified("name")) {
+    this.normalizedName = normalizeVietnamese(this.name);
+  }
+
+  if (this.isModified("author")) {
+    this.normalizedAuthor = normalizeVietnamese(this.author);
+  }
+
+  if (this.isModified("genre") && this.genre) {
+    this.normalizedGenre = normalizeVietnamese(this.genre);
+  }
+  next();
+});
+
+sachSchema.pre(["findOneAndUpdate", "updateOne"], function (next) {
+  const update = this.getUpdate() as any;
+
+  if (update.name) {
+    update.normalizedName = normalizeVietnamese(update.name);
+  }
+
+  if (update.author) {
+    update.normalizedAuthor = normalizeVietnamese(update.author);
+  }
+
+  if (update.genre) {
+    update.normalizedGenre = normalizeVietnamese(update.genre);
+  }
+
   next();
 });
 

@@ -7,6 +7,7 @@ import {
   generateSuccessResponse,
   generateErrorResponse,
 } from "../utils/response.ts";
+import type { normalize } from "path";
 
 interface PublisherRequest extends Request {
   body: Pick<INhaXuatBan, "name" | "address">;
@@ -29,6 +30,8 @@ class PublisherController {
         statusCode: 201,
       });
     } catch (error: unknown) {
+      console.error("Error creating publisher:", error);
+
       const errorMessage =
         error instanceof Error ? error.message : "An unknown error occurred";
       return generateErrorResponse({
@@ -41,7 +44,25 @@ class PublisherController {
 
   getAllPublishers = async (req: Request, res: Response): Promise<any> => {
     try {
-      const publishers = await pagnigate<INhaXuatBan>(req, NhaXuatBan);
+      const { query } = req.query;
+
+      let searchOption: any = {};
+      if (query) {
+        const regex = new RegExp(String(query), "i");
+        searchOption = {
+          $or: [
+            { normalizedName: { $regex: regex } },
+            { normalizedAddress: { $regex: regex } },
+          ],
+        };
+      }
+
+      const publishers = await pagnigate<INhaXuatBan>(
+        req,
+        NhaXuatBan,
+        "",
+        searchOption
+      );
       return generateSuccessResponse({
         res,
         message: "Publishers retrieved successfully",

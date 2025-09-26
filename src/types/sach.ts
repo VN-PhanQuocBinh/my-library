@@ -1,5 +1,6 @@
 export interface ISach extends Document {
   name: string;
+  normalizedName?: string; 
   description?: string;
   slug?: string;
   price: {
@@ -9,7 +10,9 @@ export interface ISach extends Document {
   quantity: number;
   publisher: string; // Reference to NhaXuatBan ID
   author: string;
+  normalizedAuthor?: string;
   genre?: string;
+  normalizedGenre?: string;
   pages?: number;
   language?: string;
   publishedDate?: Date;

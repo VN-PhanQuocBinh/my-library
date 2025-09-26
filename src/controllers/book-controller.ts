@@ -38,10 +38,6 @@ class BookController {
         payload.price = JSON.parse(payload.price);
       }
 
-      // console.log("Payload:", payload);
-      // console.log(req.files);
-      // return res.json({ message: "ok" });
-
       if (!req.files) {
         return generateErrorResponse({
           res,
@@ -91,6 +87,7 @@ class BookController {
         statusCode: 201,
       });
     } catch (error) {
+      console.error("Error creating book:", error);
       return generateErrorResponse({
         res,
         message: "Failed to create book",
@@ -109,9 +106,9 @@ class BookController {
         const regex = new RegExp(String(query), "i");
         searchOption = {
           $or: [
-            { name: { $regex: regex } },
-            { author: { $regex: regex } },
-            { genre: { $regex: regex } },
+            { normalizedName: { $regex: regex } },
+            { normalizedAuthor: { $regex: regex } },
+            { normalizedGenre: { $regex: regex } },
           ],
         };
       }
