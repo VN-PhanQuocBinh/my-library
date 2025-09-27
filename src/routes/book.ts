@@ -1,6 +1,6 @@
 import express from "express";
 import BookController, { upload } from "../controllers/book-controller.ts";
-import bookBorrowigController from "../controllers/book-borrowig-controller.ts";
+import bookBorrowigController from "../controllers/book-borrowing-controller.ts";
 
 const router = express.Router();
 

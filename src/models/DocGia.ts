@@ -13,6 +13,11 @@ const DocGiaSchema = new Schema<IDocGia>(
       enum: ["male", "female", "other"],
       default: "other",
     },
+    status: {
+      type: String,
+      enum: ["active", "inactive", "banned"],
+      default: "active",
+    },
     dateOfBirth: {
       type: Date,
       required: true,
@@ -53,6 +58,11 @@ const DocGiaSchema = new Schema<IDocGia>(
   },
   { timestamps: true }
 );
+
+DocGiaSchema.index({
+  firstname: "text",
+  lastname: "text",
+});
 
 DocGiaSchema.methods.comparePassword = function (
   password = ""

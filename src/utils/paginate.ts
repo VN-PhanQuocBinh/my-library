@@ -31,31 +31,43 @@ const paginate = async <T = any>(
   options: mongoose.QueryOptions = {}
 ): Promise<PaginateResponse<T>> => {
   try {
-    const page = parseInt(req.query.page as string, 10) || 0;
-    const limit = parseInt(req.query.limit as string, 10) || 10;
+    const all = String(req.query.all) === "true";
 
-    const totalCount = await Model.countDocuments(options);
+    let list: T[];
+    let pagination: PaginationResult;
 
-    const skipIndex = page * limit;
-    const totalPages = Math.ceil(totalCount / limit);
+    if (all) {
+      list = await Model.find(options).populate(populate).lean<T[]>();
+      pagination = {
+        page: 0,
+        limit: list.length,
+        total: list.length,
+        totalPages: 1,
+      };
+    } else {
+      const page = parseInt(req.query.page as string, 10) || 0;
+      const limit = parseInt(req.query.limit as string, 10) || 10;
 
-    const list = await Model.find(options)
-      .skip(skipIndex)
-      .limit(limit)
-      .populate(populate)
-      .lean<T[]>();
+      const totalCount = await Model.countDocuments(options);
 
-    const pagination = {
-      page,
-      limit,
-      total: totalCount,
-      totalPages,
-    };
+      const skipIndex = page * limit;
+      const totalPages = Math.ceil(totalCount / limit);
 
-    return {
-      list,
-      pagination,
-    };
+      list = await Model.find(options)
+        .skip(skipIndex)
+        .limit(limit)
+        .populate(populate)
+        .lean<T[]>();
+
+      pagination = {
+        page,
+        limit,
+        total: totalCount,
+        totalPages,
+      };
+    }
+
+    return { list, pagination };
   } catch (error) {
     const errorMessage =
       error instanceof Error ? error.message : "Unknown pagination error";

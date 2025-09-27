@@ -4,6 +4,7 @@ export interface IDocGia extends Document {
   firstname: string;
   lastname: string;
   gender: "male" | "female" | "other";
+  status?: "active" | "inactive" | "banned";
   dateOfBirth: Date;
   phoneNumber: string;
   email: string;

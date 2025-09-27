@@ -13,10 +13,19 @@ import {
 class BookBorrowingController {
   async getAllBorrowings(req: Request, res: Response): Promise<any> {
     try {
-      const borrowings = await paginate(req, TheoDoiMuonSach, [
-        "userId",
-        "bookId",
-      ]);
+      const { status } = req.query;
+      let filterOptions: any = {};
+
+      if (status) {
+        filterOptions.status = status;
+      }
+
+      const borrowings = await paginate(
+        req,
+        TheoDoiMuonSach,
+        ["userId", "bookId"],
+        filterOptions
+      );
       return generateSuccessResponse({
         res,
         message: "Fetched all borrowings successfully",
