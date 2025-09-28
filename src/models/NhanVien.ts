@@ -53,6 +53,7 @@ const NhanVienSchema = new Schema<INhanVien>(
 
 NhanVienSchema.index({
   normalizedFullname: "text",
+  email: "text",
 });
 
 NhanVienSchema.pre("save", function (next) {

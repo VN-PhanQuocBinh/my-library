@@ -62,8 +62,7 @@ const DocGiaSchema = new Schema<IDocGia>(
 );
 
 DocGiaSchema.index({
-  firstname: "text",
-  lastname: "text",
+  email: "text",
   normalizedFullname: "text",
 });
 

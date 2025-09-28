@@ -10,7 +10,7 @@ import { type Express } from "express";
 
 function routes(app: Express) {
   app.use("/api/admin/auth", adminAuthRouter);
-  app.use("/api/admin/user", userRouter);
+  app.use("/api/admin/users", userRouter);
   app.use("/api/admin/admins", adminRouter);
   
   app.use("/api/auth", userAuthRouter);

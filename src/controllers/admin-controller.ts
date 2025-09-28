@@ -15,6 +15,8 @@ import { formatUserResponse } from "../utils/response.ts";
 import type { INhanVienWithId } from "../types/nhan-vien.ts";
 import type { StaffJWTPayload } from "../types/request.ts";
 
+import { createSearchOptions } from "../utils/create-search-options.ts";
+
 const JWT_SECRET = process.env.JWT_SECRET || "dev_secret";
 const JWT_EXPIRES = process.env.JWT_EXPIRES || "1 day";
 
@@ -30,20 +32,27 @@ interface MongooseValidationError extends Error {
   >;
 }
 
-const signUser = (user: INhanVienWithId): string => {
-  const payload: StaffJWTPayload = {
-    sub: user._id.toString(),
-    email: user.email,
-    fullname: user.fullname,
-  };
-  console.log(JWT_EXPIRES);
-  return jwt.sign(payload, JWT_SECRET, { expiresIn: "1 day" });
-};
-
 class AdminController {
   async getAllAdmins(req: Request, res: Response): Promise<any> {
     try {
-      const admins = await paginate(req, NhanVien, "");
+      const { query, duty, status } = req.query;
+
+      const searchOption = createSearchOptions(
+        query as string,
+        ["normalizedFullname", "email"],
+        {
+          duty: {
+            value: duty as string,
+            condition: ["staff", "manager"].includes(duty as string),
+          },
+          status: {
+            value: status as string,
+            condition: ["active", "inactive"].includes(status as string),
+          },
+        }
+      );
+
+      const admins = await paginate(req, NhanVien, "", searchOption);
       return generateSuccessResponse({
         res,
         message: "Admins fetched successfully",
@@ -131,7 +140,7 @@ class AdminController {
   async updateAdmin(req: Request, res: Response): Promise<any> {
     try {
       const { id } = req.params;
-      const { fullname, duty, phoneNumber, address } = req.body;
+      const { fullname, duty, phoneNumber, address, status } = req.body;
 
       // Find admin by ID
       const admin = await NhanVien.findById(id);
@@ -144,6 +153,7 @@ class AdminController {
       admin.duty = duty || admin.duty;
       admin.phoneNumber = phoneNumber || admin.phoneNumber;
       admin.address = address || admin.address;
+      admin.status = status || admin.status;
 
       await admin.save();
 

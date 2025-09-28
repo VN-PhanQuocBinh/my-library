@@ -7,7 +7,6 @@ import {
   generateSuccessResponse,
   generateErrorResponse,
 } from "../utils/response.ts";
-import type { normalize } from "path";
 
 interface PublisherRequest extends Request {
   body: Pick<INhaXuatBan, "name" | "address">;
