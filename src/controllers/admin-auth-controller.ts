@@ -20,7 +20,6 @@ import type {
   StaffRegisterRequest,
 } from "../types/request.ts";
 import type { INhanVienWithId } from "../types/nhan-vien.ts";
-import { create } from "domain";
 
 interface MongooseValidationError extends Error {
   name: "ValidationError";
@@ -49,14 +48,12 @@ class AdminAuthController {
     try {
       const { email, password } = req.body;
       if (!email) {
-        return res
-          .status(400)
-          .json(
-            createErrorResponse({
-              message: "Email is required",
-              statusCode: 400,
-            })
-          );
+        return res.status(400).json(
+          createErrorResponse({
+            message: "Email is required",
+            statusCode: 400,
+          })
+        );
       }
 
       const user = await NhanVien.findOne({ email }).select("+passwordHash");
@@ -119,9 +116,13 @@ class AdminAuthController {
       }
 
       const passwordHash = await bcrypt.hash(password, 10);
-      const user = await NhanVien.create({ ...payload, passwordHash });
-      const token = signUser(user as any);
+      const user = new NhanVien({
+        ...payload,
+        passwordHash,
+      });
 
+      await user.save();
+      const token = signUser(user as any);
       const userResponse = formatUserResponse(user as any);
 
       return res.status(201).json(
@@ -134,7 +135,7 @@ class AdminAuthController {
         })
       );
     } catch (error: unknown) {
-      console.error("Register error:", error); 
+      console.error("Register error:", error);
       if (
         error &&
         typeof error === "object" &&

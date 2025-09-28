@@ -3,9 +3,12 @@ import bcrypt from "bcryptjs";
 
 import type { INhanVien } from "../types/nhan-vien.ts";
 
+import { normalizeVietnamese } from "../utils/normalize-vietnamese.ts";
+
 const NhanVienSchema = new Schema<INhanVien>(
   {
     fullname: { type: String, required: true },
+    normalizedFullname: { type: String, select: false },
     duty: {
       type: String,
       required: true,
@@ -34,6 +37,11 @@ const NhanVienSchema = new Schema<INhanVien>(
         message: "Please enter a valid email",
       },
     },
+    status: {
+      type: String,
+      enum: ["active", "inactive"],
+      default: "active",
+    },
     passwordHash: { type: String, required: true, select: false },
     address: {
       type: String,
@@ -42,6 +50,18 @@ const NhanVienSchema = new Schema<INhanVien>(
   },
   { timestamps: true }
 );
+
+NhanVienSchema.index({
+  normalizedFullname: "text",
+});
+
+NhanVienSchema.pre("save", function (next) {
+  if (this.isModified("fullname")) {
+    this.normalizedFullname = normalizeVietnamese(this.fullname);
+  }
+
+  next();
+});
 
 NhanVienSchema.methods.comparePassword = function (
   password = ""

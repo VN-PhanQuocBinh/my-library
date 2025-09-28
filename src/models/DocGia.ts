@@ -2,11 +2,13 @@ import mongoose, { Document, Schema } from "mongoose";
 import bcrypt from "bcryptjs";
 
 import type { IDocGia } from "../types/doc-gia.ts";
+import { normalizeVietnamese } from "../utils/normalize-vietnamese.ts";
 
 const DocGiaSchema = new Schema<IDocGia>(
   {
     firstname: { type: String, required: true, unique: true },
     lastname: { type: String, required: true },
+    normalizedFullname: { type: String, select: false },
     gender: {
       type: String,
       required: true,
@@ -62,6 +64,17 @@ const DocGiaSchema = new Schema<IDocGia>(
 DocGiaSchema.index({
   firstname: "text",
   lastname: "text",
+  normalizedFullname: "text",
+});
+
+DocGiaSchema.pre("save", function (next) {
+  if (this.isModified("firstname") || this.isModified("lastname")) {
+    this.normalizedFullname = normalizeVietnamese(
+      `${this.lastname} ${this.firstname}`
+    );
+  }
+
+  next();
 });
 
 DocGiaSchema.methods.comparePassword = function (
