@@ -140,7 +140,9 @@ class AdminController {
   async updateAdmin(req: Request, res: Response): Promise<any> {
     try {
       const { id } = req.params;
+      console.log("Update admin payload:", req.body);
       const { fullname, duty, phoneNumber, address, status } = req.body;
+
 
       // Find admin by ID
       const admin = await NhanVien.findById(id);
@@ -149,11 +151,11 @@ class AdminController {
       }
 
       // Update admin details
-      admin.fullname = fullname;
-      admin.duty = duty || admin.duty;
-      admin.phoneNumber = phoneNumber || admin.phoneNumber;
-      admin.address = address || admin.address;
-      admin.status = status || admin.status;
+      fullname && (admin.fullname = fullname);
+      duty && (admin.duty = duty);
+      phoneNumber && (admin.phoneNumber = phoneNumber);
+      address && (admin.address = address);
+      status && (admin.status = status);
 
       await admin.save();
 
