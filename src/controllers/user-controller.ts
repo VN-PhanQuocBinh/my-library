@@ -137,7 +137,7 @@ class UserController {
   async updateUser(req: Request, res: Response): Promise<any> {
     try {
       const { id } = req.params;
-      const { firstname, lastname, gender, dateOfBirth, phoneNumber, address } =
+      const { firstname, lastname, gender, dateOfBirth, phoneNumber, address, status } =
         req.body;
 
       // Find user by ID
@@ -153,6 +153,7 @@ class UserController {
       user.dateOfBirth = dateOfBirth ? new Date(dateOfBirth) : user.dateOfBirth;
       user.phoneNumber = phoneNumber || user.phoneNumber;
       user.address = address || user.address;
+      user.status = status || user.status;
 
       await user.save();
 

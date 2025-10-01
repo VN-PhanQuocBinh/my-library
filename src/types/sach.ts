@@ -1,6 +1,18 @@
+export interface ImageInfo {
+  url: string;
+  publicId: string;
+  folder?: string;
+  originalName?: string;
+  size?: number;
+  format?: string;
+  width?: number;
+  height?: number;
+  uploadedAt?: Date;
+}
+
 export interface ISach extends Document {
   name: string;
-  normalizedName?: string; 
+  normalizedName?: string;
   description?: string;
   slug?: string;
   price: {
@@ -19,8 +31,8 @@ export interface ISach extends Document {
   status?: boolean;
 
   // media
-  coverImage?: string;
-  detailedImages?: string[];
+  coverImage?: ImageInfo;
+  detailedImages?: ImageInfo[];
 }
 
 export type TGenre =

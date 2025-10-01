@@ -6,7 +6,7 @@ import { normalizeVietnamese } from "../utils/normalize-vietnamese.ts";
 
 const DocGiaSchema = new Schema<IDocGia>(
   {
-    firstname: { type: String, required: true, unique: true },
+    firstname: { type: String, required: true },
     lastname: { type: String, required: true },
     normalizedFullname: { type: String, select: false },
     gender: {

@@ -1,7 +1,7 @@
 import mongoose from "mongoose";
 // import slugify from "slugify";
 import slugify from "slugify";
-import type { ISach } from "../types/sach.ts";
+import type { ISach, ImageInfo } from "../types/sach.ts";
 import { GENRES } from "../types/sach.ts";
 import { normalizeVietnamese } from "../utils/normalize-vietnamese.ts";
 
@@ -81,19 +81,42 @@ const sachSchema = new mongoose.Schema<ISach>({
     default: true,
   },
   coverImage: {
-    type: String,
-    trim: true,
+    type: {
+      url: String,
+      publicId: String,
+      folder: String,
+      originalName: String,
+      size: Number,
+      format: String,
+      width: Number,
+      height: Number,
+      uploadedAt: Date,
+    },
     default: null,
   },
   detailedImages: [
     {
-      type: String,
-      trim: true,
+      type: {
+        url: String,
+        publicId: String,
+        folder: String,
+        originalName: String,
+        size: Number,
+        format: String,
+        width: Number,
+        height: Number,
+        uploadedAt: Date,
+      },
+      default: null,
     },
   ],
 });
 
-sachSchema.index({ normalizedName: "text", normalizedAuthor: "text", normalizedGenre: "text" });
+sachSchema.index({
+  normalizedName: "text",
+  normalizedAuthor: "text",
+  normalizedGenre: "text",
+});
 
 sachSchema.pre("save", async function (next) {
   if (this.isModified("name")) {

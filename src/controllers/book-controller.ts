@@ -10,7 +10,7 @@ import {
   generateSuccessResponse,
 } from "../utils/response.ts";
 
-import type { ISach } from "../types/sach.ts";
+import type { ISach, ImageInfo } from "../types/sach.ts";
 import pagnigate from "../utils/paginate.ts";
 
 interface BookCreateRequest extends Request {
@@ -64,7 +64,19 @@ class BookController {
           coverImage[0].buffer,
           COVER_IMAGES_PATH
         );
-        payload.coverImage = coverImageUpload.secure_url;
+
+        const storedImageInfo: ImageInfo = {
+          url: coverImageUpload.secure_url,
+          publicId: coverImageUpload.public_id,
+          folder: coverImageUpload.folder,
+          size: coverImageUpload.bytes,
+          format: coverImageUpload.format,
+          width: coverImageUpload.width,
+          height: coverImageUpload.height,
+          uploadedAt: new Date(),
+        };
+
+        payload.coverImage = storedImageInfo;
       }
 
       if (detailedImages && detailedImages.length > 0) {
@@ -73,9 +85,20 @@ class BookController {
         );
 
         const uploadedImages = await Promise.all(imageUploadPromises);
-        payload.detailedImages = uploadedImages.map(
-          (img: any) => img.secure_url
-        );
+        payload.detailedImages = uploadedImages.map((img: any) => {
+          const storedImageInfo: ImageInfo = {
+            url: img.secure_url,
+            publicId: img.public_id,
+            folder: img.folder,
+            originalName: img.originalname,
+            size: img.bytes,
+            format: img.format,
+            width: img.width,
+            height: img.height,
+            uploadedAt: new Date(),
+          };
+          return storedImageInfo;
+        });
       }
 
       const newBook = new Sach(payload);
@@ -155,7 +178,8 @@ class BookController {
       const bookId = req.params.id;
       const payload = req.body;
 
-      console.log(payload);
+      console.log(payload, req.files);
+      return res.json({ message: "Received", data: payload });
 
       if (payload?.price && typeof payload.price === "string") {
         payload.price = JSON.parse(payload.price);
