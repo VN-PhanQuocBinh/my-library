@@ -31,8 +31,8 @@ export interface ISach extends Document {
   status?: boolean;
 
   // media
-  coverImage?: ImageInfo;
-  detailedImages?: ImageInfo[];
+  coverImage?: ImageInfo | null;
+  detailedImages?: ImageInfo[] | null;
 }
 
 export type TGenre =
