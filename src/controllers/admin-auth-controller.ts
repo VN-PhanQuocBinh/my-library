@@ -80,7 +80,8 @@ class AdminAuthController {
       }
 
       const token = signUser(user as any);
-      const userResponse = formatUserResponse(user as any);
+      const userResponse = user.toObject();
+      delete userResponse.passwordHash;
 
       return res.json(
         createSuccessResponse({
