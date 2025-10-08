@@ -11,6 +11,7 @@ const nhaXuatBanSchema = new mongoose.Schema<INhaXuatBan>({
   },
   normalizedName: {
     type: String,
+    select: false,
   },
   address: {
     type: String,
@@ -20,6 +21,7 @@ const nhaXuatBanSchema = new mongoose.Schema<INhaXuatBan>({
   },
   normalizedAddress: {
     type: String,
+    select: false
   },
 });
 
