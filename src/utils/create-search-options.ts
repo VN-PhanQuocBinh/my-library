@@ -1,7 +1,7 @@
 export const createSearchOptions = (
   query: string,
   queryFields: string[] = [],
-  filters: Record<string, { value: string; condition: boolean }>
+  filters: Record<string, { value: any; condition: boolean }>
 ) => {
   let searchOption: any = {};
 

@@ -46,6 +46,7 @@ const signUser = (user: IDocGiaWithId): string => {
 class UserAuthController {
   async login(req: LoginRequest, res: Response, next: NextFunction) {
     try {
+      console.log("Login request body:", req.body); // Debug log
       const { email, password } = req.body;
       const user = await DocGia.findOne({ email }).select("+passwordHash");
 

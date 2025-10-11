@@ -26,7 +26,7 @@ const app = express();
 // enable CORS
 app.use(
   cors({
-    origin: "http://localhost:5173", // allow requests from this origin
+    origin: ["http://localhost:5173", "http://localhost:3002"],
   })
 );
 

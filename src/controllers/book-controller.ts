@@ -4,6 +4,7 @@ import type { Request, Response } from "express";
 import multer from "multer";
 import { uploadImages, deleteImages } from "../utils/image-cloud-service.ts";
 import { IMAGE_UPLOAD_PATH } from "../config/config.ts";
+import { createSearchOptions } from "../utils/create-search-options.ts";
 
 import {
   generateErrorResponse,
@@ -188,34 +189,24 @@ class BookController {
   getAllBooks = async (req: Request, res: Response): Promise<any> => {
     try {
       const { query, publisher, genre, status } = req.query;
-      let searchOption: any = {};
-
-      if (query) {
-        const regex = new RegExp(String(query), "i");
-        searchOption = {
-          $or: [
-            { normalizedName: { $regex: regex } },
-            { normalizedAuthor: { $regex: regex } },
-            { normalizedGenre: { $regex: regex } },
-          ],
-        };
-      }
-
-      if (publisher) {
-        searchOption.publisher = publisher;
-      }
-
-      if (genre) {
-        searchOption.genre = genre;
-      }
-
-      if (status) {
-        if (status === "true") {
-          searchOption.status = true;
-        } else if (status === "false") {
-          searchOption.status = false;
+      const searchOption = createSearchOptions(
+        query as string,
+        ["normalizedName", "normalizedAuthor", "normalizedGenre"],
+        {
+          publisher: {
+            value: publisher,
+            condition: !!publisher,
+          },
+          genre: {
+            value: genre,
+            condition: !!genre,
+          },
+          status: {
+            value: status,
+            condition: ["true", "false"].includes(status as string),
+          },
         }
-      }
+      );
 
       const booksResult = await pagnigate<ISach>(
         req,
