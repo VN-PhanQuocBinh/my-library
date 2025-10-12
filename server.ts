@@ -4,15 +4,6 @@ import express from "express";
 import cors from "cors";
 import routes from "./src/routes/index.ts";
 
-// load environment variables from .env file
-
-// configure cloudinary
-// cloudinary.config({
-//   cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
-//   api_key: process.env.CLOUDINARY_API_KEY,
-//   api_secret: process.env.CLOUDINARY_API_SECRET,
-// });
-
 // connect to database
 import db from "./src/config/db.ts";
 db.connect();
@@ -24,7 +15,17 @@ const app = express();
 // enable CORS
 app.use(
   cors({
-    origin: ["http://localhost:5173", "http://localhost:3002"],
+    origin: ["http://localhost:5173", "http://localhost:3002"]
+    // origin: function (origin, callback) {
+    //   console.log("Origin:", origin);
+    //   const allowedOrigins = ["http://localhost:5173", "http://localhost:3002"];
+    //   if (allowedOrigins.includes(origin)) {
+    //     callback(null, true);
+    //   } else {
+    //     callback(new Error("Not allowed by CORS"));
+    //   }
+    // },
+
   })
 );
 

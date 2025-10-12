@@ -15,7 +15,7 @@ const TheoDoiMuonSachSchema = new mongoose.Schema<TheoDoiMuonSach>(
     },
     status: {
       type: String,
-      enum: ["pending", "approved", "rejected", "returned"],
+      enum: ["pending", "approved", "rejected", "returned", "overdue", "lost"],
       default: "pending",
     },
     maxBorrowDays: { type: Number, default: 14 },

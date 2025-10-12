@@ -1,6 +1,7 @@
 import TheoDoiMuonSach from "../models/TheoDoiMuonSach.ts";
 import DocGia from "../models/DocGia.ts";
 import Sach from "../models/Sach.ts";
+import type { borrowingStatus } from "../types/theo-doi-muon-sach.ts";
 
 import type { Request, Response } from "express";
 import paginate from "../utils/paginate.ts";
@@ -8,7 +9,33 @@ import paginate from "../utils/paginate.ts";
 import {
   generateErrorResponse,
   generateSuccessResponse,
+  createErrorResponse,
+  createSuccessResponse,
 } from "../utils/response.ts";
+
+const changeValue = new Map<`${borrowingStatus}-${borrowingStatus}`, number>()
+  .set("pending-approved", -1)
+  .set("pending-rejected", 0)
+  .set("approved-returned", 1)
+  .set("approved-overdue", 0)
+  .set("approved-lost", 0)
+  .set("overdue-returned", 1)
+  .set("overdue-lost", 0);
+
+function getQuantityChange(
+  oldState: borrowingStatus,
+  newState: borrowingStatus
+): { quantityChange: number; errorMessage?: string | undefined } {
+  let value = 0;
+  let errorMessage = undefined;
+
+  if (!changeValue.has(`${oldState}-${newState}`)) {
+    errorMessage = `Invalid state transition from ${oldState} to ${newState}`;
+  }
+
+  value = changeValue.get(`${oldState}-${newState}`) || 0;
+  return { quantityChange: value, errorMessage };
+}
 
 class BookBorrowingController {
   async getAllBorrowings(req: Request, res: Response): Promise<any> {
@@ -87,6 +114,8 @@ class BookBorrowingController {
       });
 
       await newBorrowing.save();
+      existingBook.quantity -= 1;
+      await existingBook.save();
 
       return generateSuccessResponse({
         res,
@@ -178,6 +207,22 @@ class BookBorrowingController {
         return res.status(404).json({ message: "Borrowing record not found" });
       }
 
+      const book = await Sach.findById(borrowing.bookId);
+      if (!book) {
+        return res.status(404).json({ message: "Book not found" });
+      }
+
+      const { quantityChange, errorMessage } = getQuantityChange(
+        borrowing.status,
+        status
+      );
+
+      if (errorMessage) {
+        return res.status(400).json({ message: errorMessage });
+      }
+      book.quantity += quantityChange;
+      await book.save();
+
       borrowing.status = status;
       await borrowing.save();
 
@@ -213,7 +258,9 @@ class BookBorrowingController {
   async getUserBorrowings(req: any, res: any): Promise<any> {
     try {
       const userId = req.user?._id;
-      const borrowings = await paginate(req, TheoDoiMuonSach, "bookId", { userId });
+      const borrowings = await paginate(req, TheoDoiMuonSach, "bookId", {
+        userId,
+      });
       if (!userId) {
         return generateErrorResponse({
           res,
