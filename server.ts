@@ -2,10 +2,9 @@ import type { Request, Response } from "express";
 
 import express from "express";
 import cors from "cors";
-import dotenv from "dotenv";
+import routes from "./src/routes/index.ts";
 
 // load environment variables from .env file
-dotenv.config();
 
 // configure cloudinary
 // cloudinary.config({
@@ -17,7 +16,6 @@ dotenv.config();
 // connect to database
 import db from "./src/config/db.ts";
 db.connect();
-
 
 const PORT = process.env.PORT || 5000;
 
@@ -35,7 +33,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 // define router
-import routes from "./src/routes/index.ts";
+
 routes(app);
 
 app.get("/", (req: Request, res: Response) => res.send("API is running..."));

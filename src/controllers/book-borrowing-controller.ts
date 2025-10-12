@@ -57,7 +57,6 @@ class BookBorrowingController {
       }
 
       const existingBook = await Sach.findById(bookId);
-      console.log("Existing book:", existingBook);
       if (!existingBook) {
         return generateErrorResponse({
           res,
@@ -106,6 +105,69 @@ class BookBorrowingController {
     }
   }
 
+  async registerBorrowing(req: Request, res: Response): Promise<any> {
+    try {
+      const userId = req.user?._id;
+      const { bookId } = req.body;
+
+      if (!userId) {
+        return generateErrorResponse({
+          res,
+          statusCode: 401,
+          message: "Unauthorized",
+          errorDetails: "User not authenticated",
+        });
+      }
+
+      const existingBook = await Sach.findById(bookId);
+      if (!existingBook) {
+        return generateErrorResponse({
+          res,
+          statusCode: 404,
+          message: "Book not found",
+          errorDetails: "No book with the given ID",
+        });
+      }
+
+      const existingBorrowing = await TheoDoiMuonSach.findOne({
+        userId,
+        bookId,
+        status: { $in: ["pending", "approved"] },
+      });
+
+      if (existingBorrowing) {
+        return generateErrorResponse({
+          res,
+          statusCode: 409,
+          message: "Book is already borrowed",
+          errorDetails: "User has an active borrowing record for this book",
+        });
+      }
+
+      const newBorrowing = new TheoDoiMuonSach({
+        userId,
+        bookId,
+      });
+
+      await newBorrowing.save();
+
+      return generateSuccessResponse({
+        res,
+        statusCode: 201,
+        message: "Book borrowing recorded successfully",
+        data: newBorrowing,
+      });
+    } catch (error) {
+      console.error("Error registering borrowing:", error);
+      return generateErrorResponse({
+        res,
+        message: "Failed to register borrowing",
+        errorDetails: error,
+        statusCode: 500,
+      });
+    }
+  }
+
   async updateBorrowing(req: Request, res: Response): Promise<any> {
     try {
       const borrowingId = req.params.id;
@@ -146,6 +208,34 @@ class BookBorrowingController {
     borrowing.returnedAt = new Date();
     await borrowing.save();
     return res.status(200).json({ message: "Book returned successfully" });
+  }
+
+  async getUserBorrowings(req: any, res: any): Promise<any> {
+    try {
+      const userId = req.user?._id;
+      const borrowings = await paginate(req, TheoDoiMuonSach, "bookId", { userId });
+      if (!userId) {
+        return generateErrorResponse({
+          res,
+          statusCode: 401,
+          message: "Unauthorized",
+          errorDetails: "User not authenticated",
+        });
+      }
+      return generateSuccessResponse({
+        res,
+        message: "Fetched user borrowings successfully",
+        data: borrowings,
+      });
+    } catch (error) {
+      console.error("Error fetching user borrowings:", error);
+      return generateErrorResponse({
+        res,
+        message: "Failed to fetch user borrowings",
+        errorDetails: error,
+        statusCode: 500,
+      });
+    }
   }
 }
 

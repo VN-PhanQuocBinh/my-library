@@ -3,9 +3,7 @@ import jwt from "jsonwebtoken";
 import bcrypt from "bcryptjs";
 import NhanVien from "../models/NhanVien.ts";
 import { Error } from "mongoose";
-
-const JWT_SECRET = process.env.JWT_SECRET || "dev_secret";
-const JWT_EXPIRES = process.env.JWT_EXPIRES || "1 day";
+import { JWT_SECRET, JWT_EXPIRES } from "../config/env.ts";
 
 import {
   formatUserResponse,

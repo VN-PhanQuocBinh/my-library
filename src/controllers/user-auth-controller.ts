@@ -4,9 +4,7 @@ import bcrypt from "bcryptjs";
 import DocGia from "../models/DocGia.ts";
 import type { IDocGiaWithId } from "../types/doc-gia.ts";
 import { Error } from "mongoose";
-
-const JWT_SECRET = process.env.JWT_SECRET || "dev_secret";
-const JWT_EXPIRES = process.env.JWT_EXPIRES || "1 day";
+import { JWT_SECRET, JWT_EXPIRES } from "../config/env.ts";
 
 import {
   formatUserResponse,
@@ -39,7 +37,8 @@ const signUser = (user: IDocGiaWithId): string => {
     firstname: user.firstname,
     lastname: user.lastname,
   };
-  console.log(JWT_EXPIRES);
+  console.log(JWT_EXPIRES, JWT_SECRET);
+
   return jwt.sign(payload, JWT_SECRET, { expiresIn: "1 day" });
 };
 

@@ -1,7 +1,7 @@
 import Sach from "../models/Sach.ts";
 import NhaXuatBan from "../models/NhaXuatBan.ts";
 import type { Request, Response } from "express";
-import multer from "multer";
+import multer, { type Multer } from "multer";
 import { uploadImages, deleteImages } from "../utils/image-cloud-service.ts";
 import { IMAGE_UPLOAD_PATH } from "../config/config.ts";
 import { createSearchOptions } from "../utils/create-search-options.ts";

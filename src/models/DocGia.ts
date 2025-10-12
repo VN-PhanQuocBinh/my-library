@@ -57,6 +57,7 @@ const DocGiaSchema = new Schema<IDocGia>(
       type: String,
       required: true,
     },
+    __v: { type: Number, select: false },
   },
   { timestamps: true }
 );

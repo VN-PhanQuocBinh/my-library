@@ -32,6 +32,9 @@
     // "noFallthroughCasesInSwitch": true,
     // "noPropertyAccessFromIndexSignature": true,
 
+
+    "typeRoots": ["./node_modules/@types", "./src/types"],
+
     // Recommended Options
     "noEmit": true,
     "strict": true,

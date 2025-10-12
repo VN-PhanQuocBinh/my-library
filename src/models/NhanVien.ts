@@ -47,6 +47,7 @@ const NhanVienSchema = new Schema<INhanVien>(
       type: String,
       required: true,
     },
+    __v: { type: Number, select: false },
   },
   { timestamps: true }
 );

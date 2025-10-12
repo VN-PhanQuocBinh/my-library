@@ -2,15 +2,15 @@ interface BaseUser extends Document {
   email: string;
   phoneNumber: string;
   address: string;
-  passwordHash?: string;
-  __v?: number;
-  createdAt?: Date;
-  updatedAt?: Date;
+  passwordHash?: string | undefined;
+  __v?: number | undefined;
+  createdAt?: Date | undefined;
+  updatedAt?: Date | undefined;
   comparePassword(password: string): Promise<boolean>;
 }
 
 interface TypeWithId {
-  __id: string;
+  _id: string;
 }
 
 // Doc gia
