@@ -43,7 +43,7 @@ const uploadCoverImage = async (coverImage: Express.Multer.File[]) => {
 
   try {
     if (coverImage && coverImage.length > 0 && coverImage[0]) {
-      console.log("Uploading cover image ne...");
+      console.log("Uploading cover image...");
       const coverImageUpload: any = await uploadImages(
         coverImage[0].buffer,
         COVER_IMAGES_PATH
@@ -103,6 +103,7 @@ class BookController {
   createBook = async (req: BookCreateRequest, res: Response): Promise<any> => {
     try {
       const payload = req.body;
+      console.log("Payload:", payload);
 
       if (payload.price && typeof payload.price === "string") {
         payload.price = JSON.parse(payload.price);

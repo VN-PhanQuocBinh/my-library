@@ -36,26 +36,14 @@ export interface ISach extends Document {
 }
 
 export type TGenre =
-  | "fiction"
-  | "nonFiction"
-  | "scienceFiction"
-  | "fantasy"
-  | "mystery"
-  | "biography"
-  | "history"
-  | "poetry"
-  | "self-help"
-  | "business";
+  | "Tiểu thuyết"
+  | "Marketing - Bán hàng"
+  | "Kỹ năng sống"
+  | "Tâm lý";
 
 export const GENRES: TGenre[] = [
-  "fiction",
-  "nonFiction",
-  "scienceFiction",
-  "fantasy",
-  "mystery",
-  "biography",
-  "history",
-  "poetry",
-  "self-help",
-  "business",
+  "Tiểu thuyết",
+  "Marketing - Bán hàng",
+  "Kỹ năng sống",
+  "Tâm lý",
 ];

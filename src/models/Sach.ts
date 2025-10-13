@@ -54,7 +54,6 @@ const sachSchema = new mongoose.Schema<ISach>({
     type: String,
     enum: GENRES,
     trim: true,
-    lowercase: true,
   },
   normalizedGenre: {
     type: String,

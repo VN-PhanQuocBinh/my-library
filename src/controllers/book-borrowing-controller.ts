@@ -202,16 +202,19 @@ class BookBorrowingController {
       const borrowingId = req.params.id;
       const { status } = req.body;
 
+      // Find the borrowing record
       const borrowing = await TheoDoiMuonSach.findById(borrowingId);
       if (!borrowing) {
         return res.status(404).json({ message: "Borrowing record not found" });
       }
 
+      // Find the associated book
       const book = await Sach.findById(borrowing.bookId);
       if (!book) {
         return res.status(404).json({ message: "Book not found" });
       }
 
+      // Determine the quantity change based on status transition
       const { quantityChange, errorMessage } = getQuantityChange(
         borrowing.status,
         status
@@ -220,9 +223,13 @@ class BookBorrowingController {
       if (errorMessage) {
         return res.status(400).json({ message: errorMessage });
       }
+
+      // Update book quantity and borrowing status
       book.quantity += quantityChange;
       await book.save();
 
+      // Update borrowing record
+      if (status === "returned") borrowing.returnedAt = new Date();
       borrowing.status = status;
       await borrowing.save();
 

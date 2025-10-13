@@ -17,6 +17,7 @@ import type {
   LoginRequest,
   ReaderRegisterRequest,
 } from "../types/request.ts";
+import { format } from "path";
 
 interface MongooseValidationError extends Error {
   name: "ValidationError";
@@ -167,6 +168,35 @@ class UserAuthController {
                 ? (error as Error)?.message
                 : "Something went wrong",
           },
+        })
+      );
+    }
+  }
+
+  async getProfile(req: Request, res: Response, next: NextFunction) {
+    try {
+      const user = await DocGia.findById(req.user?._id);
+      if (!user) {
+        return res.status(404).json(
+          createErrorResponse({
+            message: "User not found",
+            statusCode: 404,
+          })
+        );
+      }
+
+      return res.json(
+        createSuccessResponse({
+          message: "Get user successfully",
+          data: {
+            user: formatUserResponse(user as any),
+          },
+        })
+      );
+    } catch (error) {
+      return res.status(500).json(
+        createErrorResponse({
+          message: "Fail to get user. Something went wrong.",
         })
       );
     }

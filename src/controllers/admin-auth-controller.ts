@@ -181,6 +181,35 @@ class AdminAuthController {
     }
   }
 
+  async getProfile(req: Request, res: Response, next: NextFunction) {
+    try {
+      const user = await NhanVien.findById(req.user?._id);
+      if (!user) {
+        return res.status(404).json(
+          createErrorResponse({
+            message: "User not found",
+            statusCode: 404,
+          })
+        );
+      }
+
+      return res.json(
+        createSuccessResponse({
+          message: "Get user successfully",
+          data: {
+            user,
+          },
+        })
+      );
+    } catch (error) {
+      return res.status(500).json(
+        createErrorResponse({
+          message: "Fail to get user. Something went wrong.",
+        })
+      );
+    }
+  }
+
   logout(req: Request, res: Response, next: NextFunction) {
     return res.status(200).json({ message: "Đăng xuất thành công." });
   }
