@@ -46,9 +46,20 @@ const signUser = (user: IDocGiaWithId): string => {
 class UserAuthController {
   async login(req: LoginRequest, res: Response, next: NextFunction) {
     try {
-      console.log("Login request body:", req.body); // Debug log
       const { email, password } = req.body;
       const user = await DocGia.findOne({ email }).select("+passwordHash");
+
+      console.log(user);
+
+      if (user?.isBanned) {
+        const code = 403;
+        return res.status(code).json(
+          createErrorResponse({
+            message: "Your account is banned",
+            statusCode: code,
+          })
+        );
+      }
 
       if (!user) {
         const code = 400;
@@ -181,6 +192,16 @@ class UserAuthController {
           createErrorResponse({
             message: "User not found",
             statusCode: 404,
+          })
+        );
+      }
+
+      if (user.isBanned) {
+        const code = 403;
+        return res.status(code).json(
+          createErrorResponse({
+            message: "User is banned",
+            statusCode: code,
           })
         );
       }

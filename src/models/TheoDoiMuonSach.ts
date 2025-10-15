@@ -19,7 +19,7 @@ const TheoDoiMuonSachSchema = new mongoose.Schema<TheoDoiMuonSach>(
       default: "pending",
     },
     maxBorrowDays: { type: Number, default: 14 },
-    borrowedAt: { type: Date, default: Date.now },
+    borrowedAt: { type: Date, default: null },
     returnedAt: { type: Date, default: null },
   },
   { timestamps: true }

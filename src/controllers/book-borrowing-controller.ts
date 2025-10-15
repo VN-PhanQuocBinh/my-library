@@ -9,10 +9,11 @@ import paginate from "../utils/paginate.ts";
 import {
   generateErrorResponse,
   generateSuccessResponse,
-  createErrorResponse,
-  createSuccessResponse,
 } from "../utils/response.ts";
 
+import { PenaltyService } from "../services/penalty.service.ts";
+
+// Map defining quantity changes for valid state transitions
 const changeValue = new Map<`${borrowingStatus}-${borrowingStatus}`, number>()
   .set("pending-approved", -1)
   .set("pending-rejected", 0)
@@ -22,6 +23,7 @@ const changeValue = new Map<`${borrowingStatus}-${borrowingStatus}`, number>()
   .set("overdue-returned", 1)
   .set("overdue-lost", 0);
 
+// Function to get quantity change based on state transition
 function getQuantityChange(
   oldState: borrowingStatus,
   newState: borrowingStatus
@@ -37,6 +39,7 @@ function getQuantityChange(
   return { quantityChange: value, errorMessage };
 }
 
+// Controller for book borrowing operations
 class BookBorrowingController {
   async getAllBorrowings(req: Request, res: Response): Promise<any> {
     try {
@@ -226,30 +229,40 @@ class BookBorrowingController {
 
       // Update book quantity and borrowing status
       book.quantity += quantityChange;
-      await book.save();
 
+      if (status === "approved" && !borrowing.borrowedAt) {
+        borrowing.borrowedAt = new Date();
+      }
+      await book.save();
+      
       // Update borrowing record
       if (status === "returned") borrowing.returnedAt = new Date();
       borrowing.status = status;
       await borrowing.save();
+      await PenaltyService.calculateAndApplyPenalties(borrowingId || "");
 
-      return generateSuccessResponse({
-        res,
-        message: "Borrowing record updated successfully",
-        data: borrowing,
-        statusCode: 200,
-      });
+      return res.status(200).json(
+        generateSuccessResponse({
+          res,
+          message: "Borrowing record updated successfully",
+          data: borrowing,
+          statusCode: 200,
+        })
+      );
     } catch (error) {
       console.error("Error updating borrowing record:", error);
-      return generateErrorResponse({
-        res,
-        message: "Failed to update borrowing record",
-        errorDetails: error,
-        statusCode: 500,
-      });
+      return res.json(
+        generateErrorResponse({
+          res,
+          message: "Failed to update borrowing record",
+          errorDetails: error,
+          statusCode: 500,
+        })
+      );
     }
   }
 
+  // New method to handle book returns for ADMIN roles
   async returnBook(req: Request, res: Response) {
     const borrowingId = req.params.id;
     const borrowing = await TheoDoiMuonSach.findById(borrowingId);

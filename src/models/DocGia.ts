@@ -57,10 +57,35 @@ const DocGiaSchema = new Schema<IDocGia>(
       type: String,
       required: true,
     },
+
+    totalDebt: { type: Number, required: true, default: 0 },
+    currentBanUntil: { type: Date, default: null },
+    penaltyLog: [
+      {
+        amount: { type: Number },
+        reason: { type: String, required: true, default: "No reason provided" },
+        type: {
+          type: String,
+          required: true,
+          enum: ["late-return", "lost-book", "other"],
+        },
+        banUntilDate: { type: Date },
+        borrowId: { type: Schema.Types.ObjectId, ref: "TheoDoiMuonSach" },
+        createdAt: { type: Date, default: Date.now },
+      },
+    ],
+
     __v: { type: Number, select: false },
   },
-  { timestamps: true }
+  { timestamps: true, toJSON: { virtuals: true }, toObject: { virtuals: true } }
 );
+
+DocGiaSchema.virtual("isBanned").get(function (this: IDocGia) {
+  if (!this.currentBanUntil) {
+    return true;
+  }
+  return this.currentBanUntil > new Date();
+});
 
 DocGiaSchema.index({
   email: "text",
