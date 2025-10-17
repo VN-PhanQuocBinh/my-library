@@ -18,6 +18,7 @@ import type {
   ReaderRegisterRequest,
 } from "../types/request.ts";
 import { format } from "path";
+import { create } from "domain";
 
 interface MongooseValidationError extends Error {
   name: "ValidationError";
@@ -49,13 +50,15 @@ class UserAuthController {
       const { email, password } = req.body;
       const user = await DocGia.findOne({ email }).select("+passwordHash");
 
-      console.log(user);
-
       if (user?.isBanned) {
         const code = 403;
         return res.status(code).json(
           createErrorResponse({
-            message: "Your account is banned",
+            message: `Tài khoản của bạn bị cấm cho đến ${
+              user.currentBanUntil
+                ? new Date(user.currentBanUntil).toLocaleDateString()
+                : "một ngày không xác định"
+            }`,
             statusCode: code,
           })
         );
@@ -113,13 +116,28 @@ class UserAuthController {
       const { password, ...payload } = req.body;
 
       // Check email exists
-      const isExist = await DocGia.findOne({ email: payload.email });
+      const isExist = await DocGia.findOne({
+        $or: [{ email: payload.email }, { phoneNumber: payload.phoneNumber }],
+      });
 
       if (isExist) {
-        return res.status(400).json({
-          message: "Email already exist",
-          email: payload.email,
-        });
+        const conflictField =
+          isExist.email === payload.email ? "Email" : "Phone number";
+
+        const additionalData = {};
+        if (conflictField === "Email") {
+          (additionalData as any).conflictValue = payload.email;
+        } else {
+          (additionalData as any).conflictValue = payload.phoneNumber;
+        }
+
+        return res.status(400).json(
+          createErrorResponse({
+            message: `${conflictField} already exists`,
+            statusCode: 400,
+            additionalData,
+          })
+        );
       }
 
       const passwordHash = await bcrypt.hash(password, 10);

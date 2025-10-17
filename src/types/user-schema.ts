@@ -19,6 +19,9 @@ export interface IDocGia extends BaseUser {
   lastname: string;
   gender: "male" | "female" | "other";
   dateOfBirth: Date;
+
+  // Virtual fields
+  isBanned?: boolean;
 }
 
 export interface IDocGiaWithId extends IDocGia, TypeWithId {}

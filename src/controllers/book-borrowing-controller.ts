@@ -217,6 +217,12 @@ class BookBorrowingController {
         return res.status(404).json({ message: "Book not found" });
       }
 
+      // Find the associated user
+      const user = await DocGia.findById(borrowing.userId);
+      if (!user) {
+        return res.status(404).json({ message: "User not found" });
+      }
+
       // Determine the quantity change based on status transition
       const { quantityChange, errorMessage } = getQuantityChange(
         borrowing.status,
@@ -233,13 +239,16 @@ class BookBorrowingController {
       if (status === "approved" && !borrowing.borrowedAt) {
         borrowing.borrowedAt = new Date();
       }
-      await book.save();
       
       // Update borrowing record
       if (status === "returned") borrowing.returnedAt = new Date();
+      if (status === "lost") user.totalDebt += book.price.original || 0;
       borrowing.status = status;
-      await borrowing.save();
       await PenaltyService.calculateAndApplyPenalties(borrowingId || "");
+      
+      await borrowing.save();
+      await book.save();
+      await user.save();
 
       return res.status(200).json(
         generateSuccessResponse({
