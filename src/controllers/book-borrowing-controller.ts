@@ -1,4 +1,5 @@
 import TheoDoiMuonSach from "../models/TheoDoiMuonSach.ts";
+import type { TheoDoiMuonSach as ITheoDoiMuonSach } from "../types/theo-doi-muon-sach.ts";
 import DocGia from "../models/DocGia.ts";
 import Sach from "../models/Sach.ts";
 import type { borrowingStatus } from "../types/theo-doi-muon-sach.ts";
@@ -39,6 +40,24 @@ function getQuantityChange(
   return { quantityChange: value, errorMessage };
 }
 
+const updateBorrowingStatus = async (borrowing: ITheoDoiMuonSach) => {
+  if (!borrowing.borrowedAt) return borrowing;
+
+  let returnDate = new Date(borrowing.borrowedAt || "");
+  returnDate.setDate(returnDate.getDate() + (borrowing.maxBorrowDays || 14));
+
+  const isOverdue = new Date() > returnDate;
+  if (isOverdue && changeValue.has(`${borrowing.status}-overdue`)) {
+    borrowing.status = "overdue";
+
+    await TheoDoiMuonSach.findByIdAndUpdate(borrowing._id, {
+      status: "overdue",
+    }).exec();
+  }
+
+  return borrowing;
+};
+
 // Controller for book borrowing operations
 class BookBorrowingController {
   async getAllBorrowings(req: Request, res: Response): Promise<any> {
@@ -56,6 +75,11 @@ class BookBorrowingController {
         ["userId", "bookId"],
         filterOptions
       );
+
+      for (const borrowing of borrowings.list) {
+        await updateBorrowingStatus(borrowing);
+      }
+
       return generateSuccessResponse({
         res,
         message: "Fetched all borrowings successfully",
@@ -236,16 +260,26 @@ class BookBorrowingController {
       // Update book quantity and borrowing status
       book.quantity += quantityChange;
 
-      if (status === "approved" && !borrowing.borrowedAt) {
-        borrowing.borrowedAt = new Date();
+      switch (status) {
+        case "approved":
+          if (!borrowing.borrowedAt) {
+            borrowing.borrowedAt = new Date();
+          }
+          break;
+        case "returned":
+          borrowing.returnedAt = new Date();
+          break;
+        case "lost":
+          user.totalDebt += book.price.original || 0;
+          break;
+        case "returned":
+        case "lost":
+        default:
       }
-      
-      // Update borrowing record
-      if (status === "returned") borrowing.returnedAt = new Date();
-      if (status === "lost") user.totalDebt += book.price.original || 0;
+
       borrowing.status = status;
       await PenaltyService.calculateAndApplyPenalties(borrowingId || "");
-      
+
       await borrowing.save();
       await book.save();
       await user.save();
@@ -290,6 +324,7 @@ class BookBorrowingController {
       const borrowings = await paginate(req, TheoDoiMuonSach, "bookId", {
         userId,
       });
+
       if (!userId) {
         return generateErrorResponse({
           res,
@@ -298,6 +333,11 @@ class BookBorrowingController {
           errorDetails: "User not authenticated",
         });
       }
+
+      for (const borrowing of borrowings.list) {
+        await updateBorrowingStatus(borrowing);
+      }
+
       return generateSuccessResponse({
         res,
         message: "Fetched user borrowings successfully",

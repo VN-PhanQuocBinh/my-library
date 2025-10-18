@@ -17,8 +17,6 @@ import type {
   LoginRequest,
   ReaderRegisterRequest,
 } from "../types/request.ts";
-import { format } from "path";
-import { create } from "domain";
 
 interface MongooseValidationError extends Error {
   name: "ValidationError";

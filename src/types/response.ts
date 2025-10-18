@@ -1,4 +1,5 @@
 import type { Gender } from "./common.ts";
+import type { PenaltyRecord } from "../types/doc-gia.ts";
 
 export interface SuccessResponse<T = any> {
   status: "success";
@@ -22,6 +23,14 @@ export interface UserResponse {
   dateOfBirth: Date;
   phoneNumber: string;
   address: string;
+
+  totalDebt: number;
+  currentBanUntil?: Date | undefined;
+  penaltyLog: PenaltyRecord[];
+
+  // virtuals
+  isBanned?: boolean;
+
   createdAt?: Date | undefined;
   updatedAt?: Date | undefined;
 }

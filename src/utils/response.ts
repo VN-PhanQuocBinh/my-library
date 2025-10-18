@@ -20,11 +20,15 @@ const formatUserResponse = (user: IDocGiaWithId): UserResponse => {
     dateOfBirth: user.dateOfBirth,
     phoneNumber: user.phoneNumber,
     address: user.address,
+
+    totalDebt: user.totalDebt,
+    currentBanUntil: user.currentBanUntil,
+    penaltyLog: user.penaltyLog,
+
     createdAt: user.createdAt,
     updatedAt: user.updatedAt,
   };
 };
-
 
 const createSuccessResponse = ({
   message,
