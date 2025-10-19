@@ -9,5 +9,6 @@ router.post("/register", readerAuthController.register);
 router.post("/login", readerAuthController.login);
 router.post("/logout", readerAuthController.logout);
 router.get("/profile", requireAuth, readerAuthController.getProfile);
+router.patch("/profile/:id", requireAuth, readerAuthController.updateProfile);
 
 export default router;

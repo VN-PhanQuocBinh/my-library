@@ -239,6 +239,41 @@ class UserAuthController {
     }
   }
 
+  async updateProfile(req: Request, res: Response, next: NextFunction) {
+    try {
+      const userId = req.params.id;
+      const updateData = req.body;
+
+      const updatedUser = await DocGia.findByIdAndUpdate(userId, updateData, {
+        new: true,
+      });
+
+      if (!updatedUser) {
+        return res.status(404).json(
+          createErrorResponse({
+            message: "User not found",
+            statusCode: 404,
+          })
+        );
+      }
+
+      return res.json(
+        createSuccessResponse({
+          message: "Update user successfully",
+          data: {
+            user: formatUserResponse(updatedUser as any),
+          },
+        })
+      );
+    } catch (error) {
+      return res.status(500).json(
+        createErrorResponse({
+          message: "Fail to update user. Something went wrong.",
+        })
+      );
+    }
+  }
+
   logout(req: Request, res: Response, next: NextFunction) {
     return res.status(200).json({ message: "Đăng xuất thành công." });
   }

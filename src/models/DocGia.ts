@@ -102,6 +102,18 @@ DocGiaSchema.pre("save", function (next) {
   next();
 });
 
+DocGiaSchema.pre(["findOneAndUpdate", "updateOne"], function (next) {
+  const update = this.getUpdate() as any;
+
+  if (update.firstname || update.lastname) {
+    update.normalizedFullname = normalizeVietnamese(
+      `${update.lastname} ${update.firstname}`
+    );
+  }
+
+  next();
+});
+
 DocGiaSchema.methods.comparePassword = function (
   password = ""
 ): Promise<boolean> {
