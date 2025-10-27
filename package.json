@@ -12,6 +12,9 @@
   "license": "ISC",
   "description": "",
   "dependencies": {
+    "@google/genai": "^1.27.0",
+    "@huggingface/inference": "^4.13.0",
+    "axios": "^1.12.2",
     "bcryptjs": "^3.0.2",
     "cloudinary": "^2.7.0",
     "cors": "^2.8.5",
@@ -20,6 +23,7 @@
     "jsonwebtoken": "^9.0.2",
     "mongoose": "^8.18.1",
     "multer": "^2.0.2",
+    "openai": "^6.7.0",
     "slugify": "^1.6.6",
     "streamifier": "^0.1.1"
   },
