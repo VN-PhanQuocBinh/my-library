@@ -37,7 +37,7 @@ const signUser = (user: INhanVienWithId): string => {
     email: user.email,
     fullname: user.fullname,
   };
-  console.log(JWT_EXPIRES);
+  
   return jwt.sign(payload, JWT_SECRET, { expiresIn: "1 day" });
 };
 

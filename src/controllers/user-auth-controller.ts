@@ -37,7 +37,6 @@ const signUser = (user: IDocGiaWithId): string => {
     firstname: user.firstname,
     lastname: user.lastname,
   };
-  console.log(JWT_EXPIRES, JWT_SECRET);
 
   return jwt.sign(payload, JWT_SECRET, { expiresIn: "1 day" });
 };
