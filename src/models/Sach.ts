@@ -5,96 +5,82 @@ import type { ISach, ImageInfo } from "../types/sach.ts";
 import { GENRES } from "../types/sach.ts";
 import { normalizeVietnamese } from "../utils/normalize-vietnamese.ts";
 
-const sachSchema = new mongoose.Schema<ISach>({
-  name: {
-    type: String,
-    required: true,
-    trim: true,
-    maxlength: 100,
-  },
-  normalizedName: {
-    type: String,
-  },
-  description: {
-    type: String,
-    trim: true,
-    maxlength: 500,
-  },
-  slug: {
-    type: String,
-    trim: true,
-    unique: true,
-  },
-  price: {
-    original: { type: Number, required: true },
-    sale: { type: Number, default: 0 },
-  },
-  quantity: {
-    type: Number,
-    required: true,
-    min: 0,
-    default: 1,
-  },
-  publisher: {
-    type: String,
-    required: true,
-    trim: true,
-    maxlength: 100,
-    ref: "NhaXuatBan",
-  },
-  author: {
-    type: String,
-    required: true,
-  },
-  normalizedAuthor: {
-    type: String,
-    lowercase: true,
-  },
-  genre: {
-    type: String,
-    enum: GENRES,
-    trim: true,
-  },
-  normalizedGenre: {
-    type: String,
-    lowercase: true,
-  },
-  pages: {
-    type: Number,
-    min: 1,
-  },
-  language: {
-    type: String,
-    trim: true,
-  },
-  publishedDate: {
-    type: Date,
-    validate: {
-      validator: function (value: Date) {
-        return value <= new Date();
+const sachSchema = new mongoose.Schema<ISach>(
+  {
+    name: {
+      type: String,
+      required: true,
+      trim: true,
+      maxlength: 100,
+    },
+    normalizedName: {
+      type: String,
+    },
+    description: {
+      type: String,
+      trim: true,
+      maxlength: 500,
+    },
+    slug: {
+      type: String,
+      trim: true,
+      unique: true,
+    },
+    price: {
+      original: { type: Number, required: true },
+      sale: { type: Number, default: 0 },
+    },
+    quantity: {
+      type: Number,
+      required: true,
+      min: 0,
+      default: 1,
+    },
+    publisher: {
+      type: String,
+      required: true,
+      trim: true,
+      maxlength: 100,
+      ref: "NhaXuatBan",
+    },
+    author: {
+      type: String,
+      required: true,
+    },
+    normalizedAuthor: {
+      type: String,
+      lowercase: true,
+    },
+    genre: {
+      type: String,
+      enum: GENRES,
+      trim: true,
+    },
+    normalizedGenre: {
+      type: String,
+      lowercase: true,
+    },
+    pages: {
+      type: Number,
+      min: 1,
+    },
+    language: {
+      type: String,
+      trim: true,
+    },
+    publishedDate: {
+      type: Date,
+      validate: {
+        validator: function (value: Date) {
+          return value <= new Date();
+        },
       },
     },
-  },
-  status: {
-    type: Boolean,
-    default: true,
-  },
-  coverImage: {
-    type: {
-      url: String,
-      publicId: String,
-      folder: String,
-      originalName: String,
-      size: Number,
-      format: String,
-      width: Number,
-      height: Number,
-      uploadedAt: Date,
+    status: {
+      type: Boolean,
+      default: true,
     },
-    default: null,
-  },
-  detailedImages: [
-    {
+    coverImage: {
       type: {
         url: String,
         publicId: String,
@@ -108,8 +94,33 @@ const sachSchema = new mongoose.Schema<ISach>({
       },
       default: null,
     },
-  ],
-});
+    detailedImages: [
+      {
+        type: {
+          url: String,
+          publicId: String,
+          folder: String,
+          originalName: String,
+          size: Number,
+          format: String,
+          width: Number,
+          height: Number,
+          uploadedAt: Date,
+        },
+        default: null,
+      },
+    ],
+
+    embeddingVector: {
+      type: [Number],
+      default: null,
+      select: false,
+    },
+  },
+  {
+    timestamps: true,
+  }
+);
 
 sachSchema.index({
   normalizedName: "text",

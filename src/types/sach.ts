@@ -11,6 +11,7 @@ export interface ImageInfo {
 }
 
 export interface ISach extends Document {
+  _id?: string;
   name: string;
   normalizedName?: string;
   description?: string;
@@ -33,6 +34,8 @@ export interface ISach extends Document {
   // media
   coverImage?: ImageInfo | null;
   detailedImages?: ImageInfo[] | null;
+
+  embeddingVector: number[] | null;
 }
 
 export type TGenre =

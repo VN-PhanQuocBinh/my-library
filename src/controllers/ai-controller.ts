@@ -9,6 +9,16 @@ class AIController {
   async generateEmbedding(req: Request, res: Response) {
     try {
       const { prompt } = req.body;
+
+      if (!prompt) {
+        return res.status(400).json(
+          createErrorResponse({
+            message: "Prompt is required",
+            statusCode: 400,
+          })
+        );
+      }
+
       const embeddingResponse = await generateEmbeddingWithHuggingFace(prompt);
       return res.status(200).json(
         createSuccessResponse({

@@ -13,7 +13,6 @@
   "description": "",
   "dependencies": {
     "@google/genai": "^1.27.0",
-    "@huggingface/inference": "^4.13.0",
     "axios": "^1.12.2",
     "bcryptjs": "^3.0.2",
     "cloudinary": "^2.7.0",
