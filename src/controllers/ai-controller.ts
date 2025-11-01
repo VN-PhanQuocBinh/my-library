@@ -1,40 +1,38 @@
-import type { Request, Response } from "express";
-import { generateEmbeddingWithHuggingFace } from "../services/ai.service.ts";
 import {
-  createSuccessResponse,
-  createErrorResponse,
-} from "../utils/response.ts";
+  generateEmbeddingWithHuggingFace,
+  generateChatResponse,
+} from "../services/ai.service.ts";
 
 class AIController {
-  async generateEmbedding(req: Request, res: Response) {
+  async generateEmbedding(prompt: string) {
     try {
-      const { prompt } = req.body;
-
       if (!prompt) {
-        return res.status(400).json(
-          createErrorResponse({
-            message: "Prompt is required",
-            statusCode: 400,
-          })
-        );
+        throw new Error("Prompt is required");
       }
 
       const embeddingResponse = await generateEmbeddingWithHuggingFace(prompt);
-      return res.status(200).json(
-        createSuccessResponse({
-          message: "Embedding generated successfully",
-          data: embeddingResponse,
-        })
-      );
+      return embeddingResponse;
     } catch (error) {
-      console.error("Error generating embedding:", error);
-      return res.status(500).json(
-        createErrorResponse({
-          message: "Failed to generate embedding",
-          statusCode: 500,
-          additionalData: error,
-        })
-      );
+      throw new Error("Failed to generate embedding");
+    }
+  }
+
+  async getChatResponse(prompt: string) {
+    try {
+      if (!prompt) {
+        throw new Error("Prompt is required");
+      }
+
+      const systemPrompt = [
+        "Bạn là Chatbot Thư viện thông minh, thân thiện.",
+        "Hãy trả lời câu hỏi của người dùng và tạo ra một đoạn văn bản tự nhiên, lịch sự để giới thiệu TỐI ĐA 5 cuốn sách đã được gợi ý dưới đây.",
+        "Tuyệt đối không nhắc đến 'score' hay 'điểm phù hợp'.",
+      ].join(" ");
+
+      const chatResponse = await generateChatResponse(systemPrompt, prompt);
+      return chatResponse;
+    } catch (error) {
+      throw new Error("Failed to generate chat response");
     }
   }
 }

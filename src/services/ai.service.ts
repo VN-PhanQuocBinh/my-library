@@ -1,3 +1,10 @@
+import { GoogleGenAI } from "@google/genai";
+
+const AI_MODEL = "gemini-2.0-flash";
+
+
+const ai = new GoogleGenAI({});
+
 export async function generateEmbeddingWithHuggingFace(prompt: string) {
   try {
     async function query(data: any) {
@@ -21,6 +28,26 @@ export async function generateEmbeddingWithHuggingFace(prompt: string) {
       input: prompt,
     });
     return output.data[0].embedding;
+  } catch (error) {
+    throw error;
+  }
+}
+
+export async function generateChatResponse(
+  systemPrompt: string,
+  userPrompt: string
+) {
+  try {
+    const chat = await ai.chats.create({
+      model: AI_MODEL,
+      history: [{ role: "user", parts: [{ text: userPrompt }] }],
+      config: {
+        systemInstruction: systemPrompt,
+      },
+    });
+
+    const responseText = await chat.sendMessage({ message: userPrompt });
+    return responseText.text;
   } catch (error) {
     throw error;
   }

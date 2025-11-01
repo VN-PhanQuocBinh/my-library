@@ -4,6 +4,7 @@ import slugify from "slugify";
 import type { ISach, ImageInfo } from "../types/sach.ts";
 import { GENRES } from "../types/sach.ts";
 import { normalizeVietnamese } from "../utils/normalize-vietnamese.ts";
+import { generateEmbeddingWithHuggingFace } from "../services/ai.service.ts";
 
 const sachSchema = new mongoose.Schema<ISach>(
   {
@@ -161,6 +162,20 @@ sachSchema.pre("save", function (next) {
 
   if (this.isModified("genre") && this.genre) {
     this.normalizedGenre = normalizeVietnamese(this.genre);
+  }
+  next();
+});
+
+sachSchema.pre("save", async function(next) {
+  if (this.isModified("name") || this.isModified("author") || this.isModified("description")) {
+    const textToEmbed = `Book name: ${this.name}.\nAuthor: ${this.author}.\nDescription: ${this.description}`;
+    const embedding = await generateEmbeddingWithHuggingFace(textToEmbed);
+
+    if (embedding) {
+      this.embeddingVector = embedding;
+    } else {
+      this.embeddingVector = null;
+    }
   }
   next();
 });
