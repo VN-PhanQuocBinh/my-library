@@ -1,4 +1,5 @@
 import type { Request, Response } from "express";
+import Sach from "./src/models/Sach.ts";
 
 import express from "express";
 import cors from "cors";
@@ -13,6 +14,9 @@ import removeEmbeddings from "./src/scripts/remove-embeddings.ts";
 // connect to database
 import db from "./src/config/db.ts";
 db.connect();
+Sach.createVectorSearchIndex(); 
+// Sach.dropVectorSearchIndex()
+
 
 const PORT = process.env.PORT || 5000;
 

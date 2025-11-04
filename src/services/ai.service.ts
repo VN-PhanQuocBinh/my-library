@@ -2,14 +2,13 @@ import { GoogleGenAI } from "@google/genai";
 
 const AI_MODEL = "gemini-2.0-flash";
 
-
 const ai = new GoogleGenAI({});
 
 export async function generateEmbeddingWithHuggingFace(prompt: string) {
   try {
     async function query(data: any) {
       const response = await fetch(
-        "https://router.huggingface.co/nebius/v1/embeddings",
+        "https://router.huggingface.co/hf-inference/models/intfloat/multilingual-e5-large/pipeline/feature-extraction",
         {
           headers: {
             Authorization: `Bearer ${process.env.HF_TOKEN}`,
@@ -24,10 +23,12 @@ export async function generateEmbeddingWithHuggingFace(prompt: string) {
     }
 
     const output = await query({
-      model: "Qwen/Qwen3-Embedding-8B",
-      input: prompt,
+      // model: "multilingual-e5-large",
+      inputs: prompt,
     });
-    return output.data[0].embedding;
+
+    console.log("Embedding output:", output.length);
+    return output;
   } catch (error) {
     throw error;
   }

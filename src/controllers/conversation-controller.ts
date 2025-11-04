@@ -14,7 +14,8 @@ import {
   createSuccessResponse,
   createErrorResponse,
 } from "../utils/response.ts";
-import conversation from "../routes/conversation.ts";
+
+import { calculateCosineSimilarity } from "../utils/calculate-cos-similarity.ts";
 
 class ConversationController {
   async createConversation(req: Request, res: Response) {
@@ -78,6 +79,54 @@ class ConversationController {
           createErrorResponse({
             message: "Conversation not found",
             statusCode: 404,
+          })
+        );
+      }
+
+      if (type === "BOOK_RECOMMENDATION") {
+        const promptEmbedding = await aiController.generateEmbedding(message);
+        // const tmpBook = await Sach.findById("68ee7b162689443451e364a3").select(
+        //   "embeddingVector"
+        // );
+        if (!promptEmbedding) {
+          return res.status(404).json(
+            createErrorResponse({
+              message: "No books available for recommendation",
+              statusCode: 404,
+            })
+          );
+        }
+
+        console.log("Prompt embedding length:", promptEmbedding.length);
+
+        const pipeline = [
+          {
+            $vectorSearch: {
+              queryVector: promptEmbedding,
+              index: "book_vector_index",
+              path: "embeddingVector",
+              numCandidates: 50,
+              limit: 5,
+            },
+          },
+          {
+            $project: {
+              _id: 1,
+              name: 1,
+              coverImage: 1,
+              score: { $meta: "vectorSearchScore" },
+            },
+          },
+        ];
+
+        const recommendedBooks = await Sach.aggregate(pipeline);
+        console.log("Recommended books:", recommendedBooks);
+
+        return res.status(200).json(
+          createSuccessResponse({
+            message: "Similarity score calculated successfully",
+            data: { recommendedBooks },
+            statusCode: 200,
           })
         );
       }

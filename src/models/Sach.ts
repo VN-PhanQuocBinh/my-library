@@ -6,6 +6,23 @@ import { GENRES } from "../types/sach.ts";
 import { normalizeVietnamese } from "../utils/normalize-vietnamese.ts";
 import { generateEmbeddingWithHuggingFace } from "../services/ai.service.ts";
 
+const BOOK_SEARCH_INDEX_NAME = "book_vector_index";
+
+const VECTOR_INDEX_DEFINITION = {
+  name: BOOK_SEARCH_INDEX_NAME,
+  type: "vectorSearch",
+  definition: {
+    fields: [
+      {
+        path: "embeddingVector",
+        numDimensions: 1024,
+        similarity: "cosine",
+        type: "vector",
+      },
+    ],
+  },
+};
+
 const sachSchema = new mongoose.Schema<ISach>(
   {
     name: {
@@ -166,8 +183,12 @@ sachSchema.pre("save", function (next) {
   next();
 });
 
-sachSchema.pre("save", async function(next) {
-  if (this.isModified("name") || this.isModified("author") || this.isModified("description")) {
+sachSchema.pre("save", async function (next) {
+  if (
+    this.isModified("name") ||
+    this.isModified("author") ||
+    this.isModified("description")
+  ) {
     const textToEmbed = `Book name: ${this.name}.\nAuthor: ${this.author}.\nDescription: ${this.description}`;
     const embedding = await generateEmbeddingWithHuggingFace(textToEmbed);
 
@@ -197,6 +218,37 @@ sachSchema.pre(["findOneAndUpdate", "updateOne"], function (next) {
 
   next();
 });
+
+sachSchema.statics.createVectorSearchIndex = async function () {
+  try {
+    const collection = mongoose.connection.collection("Sach");
+
+    await collection.createSearchIndex(VECTOR_INDEX_DEFINITION);
+    console.log("✅ Created Vector Search Index successfully.");
+  } catch (error: any) {
+    if (error.codeName === "IndexAlreadyExists") {
+      console.log(
+        "⚠️ Vector Search Index already exists, skipping index creation."
+      );
+    } else {
+      console.error("❌ Error creating Vector Search Index:", error);
+    }
+  }
+};
+
+sachSchema.statics.dropVectorSearchIndex = async function () {
+  try {
+    const collection = mongoose.connection.collection("Sach");
+    await collection.dropSearchIndex(BOOK_SEARCH_INDEX_NAME);
+    console.log("✅ Dropped Vector Search Index successfully.");
+  } catch (error: any) {
+    if (error.codeName === "IndexNotFound") {
+      console.log("⚠️ Vector Search Index not found, skipping index drop.");
+    } else {
+      console.error("❌ Error dropping Vector Search Index:", error);
+    }
+  }
+};
 
 const Sach = mongoose.model("Sach", sachSchema, "Sach");
 
