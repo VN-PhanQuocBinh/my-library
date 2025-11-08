@@ -9,7 +9,7 @@ export interface IMessage {
   timestamp: Date;
 
   data: {
-    books?: ISach[];
+    books?: string[];
   };
 }
 

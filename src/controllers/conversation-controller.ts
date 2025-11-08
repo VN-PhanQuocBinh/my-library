@@ -17,6 +17,8 @@ import {
 
 import { calculateCosineSimilarity } from "../utils/calculate-cos-similarity.ts";
 
+import { BOOK_EMBEDDING_CONFIG } from "../config/config.ts";
+
 class ConversationController {
   async createConversation(req: Request, res: Response) {
     try {
@@ -83,54 +85,6 @@ class ConversationController {
         );
       }
 
-      if (type === "BOOK_RECOMMENDATION") {
-        const promptEmbedding = await aiController.generateEmbedding(message);
-        // const tmpBook = await Sach.findById("68ee7b162689443451e364a3").select(
-        //   "embeddingVector"
-        // );
-        if (!promptEmbedding) {
-          return res.status(404).json(
-            createErrorResponse({
-              message: "No books available for recommendation",
-              statusCode: 404,
-            })
-          );
-        }
-
-        console.log("Prompt embedding length:", promptEmbedding.length);
-
-        const pipeline = [
-          {
-            $vectorSearch: {
-              queryVector: promptEmbedding,
-              index: "book_vector_index",
-              path: "embeddingVector",
-              numCandidates: 50,
-              limit: 5,
-            },
-          },
-          {
-            $project: {
-              _id: 1,
-              name: 1,
-              coverImage: 1,
-              score: { $meta: "vectorSearchScore" },
-            },
-          },
-        ];
-
-        const recommendedBooks = await Sach.aggregate(pipeline);
-        console.log("Recommended books:", recommendedBooks);
-
-        return res.status(200).json(
-          createSuccessResponse({
-            message: "Similarity score calculated successfully",
-            data: { recommendedBooks },
-            statusCode: 200,
-          })
-        );
-      }
-
       // Save user message
       const newUserMessage = new Message();
       newUserMessage.conversationId = conversationId;
@@ -139,8 +93,126 @@ class ConversationController {
       newUserMessage.data = data;
       await newUserMessage.save();
 
-      // Get AI response
-      const systemResponse = await aiController.getChatResponse(message);
+      let rankedBooks: Record<string, string>[] = [];
+      // Handle conversation types
+      switch (type) {
+        case "SYSTEM_INFO": {
+          break;
+        }
+
+        case "BOOK_RECOMMENDATION": {
+          const promptEmbedding = await aiController.generateEmbedding(message);
+          if (!promptEmbedding) {
+            return res.status(404).json(
+              createErrorResponse({
+                message: "No books available for recommendation",
+                statusCode: 404,
+              })
+            );
+          }
+
+          const pipeline = [
+            {
+              $vectorSearch: {
+                queryVector: promptEmbedding,
+                index: BOOK_EMBEDDING_CONFIG.SEARCH_INDEX_NAME,
+                path: BOOK_EMBEDDING_CONFIG.PATH,
+                numCandidates: BOOK_EMBEDDING_CONFIG.NUMBER_CANDIDATES, // The number of candidates to consider for vector search
+                limit: BOOK_EMBEDDING_CONFIG.LIMIT, // The number of results to return
+              },
+            },
+
+            // Optionally, project the fields you want to return
+            {
+              $project: {
+                _id: 1,
+                name: 1,
+                author: 1,
+                description: 1,
+                coverImage: 1,
+                score: { $meta: "vectorSearchScore" },
+              },
+            },
+          ];
+          const recommendedBooks = await Sach.aggregate(pipeline);
+
+          // Calculate similarity scores
+          const sentences = recommendedBooks.map(
+            (book) =>
+              `Book name: ${book.name}.\nAuthor: ${book.author}.\nDescription: ${book.description}`
+          );
+          const similarityScores = await aiController.getSentenceSimilarity(
+            message,
+            sentences
+          );
+
+          // Rank books based on similarity scores
+          const averageScores =
+            similarityScores.reduce((a: number, b: number) => a + b, 0) /
+            similarityScores.length;
+
+          // Store books with similarity score above average
+          similarityScores.forEach((score: number, index: number) => {
+            if (score >= averageScores && score > 0) {
+              // Add score to passed book object
+              const passedBook = recommendedBooks[index];
+              passedBook.score = score;
+              rankedBooks.push(passedBook);
+            }
+          });
+
+          rankedBooks = rankedBooks.sort((a: any, b: any) => b.score - a.score);
+          // return res.status(200).json(
+          //   createSuccessResponse({
+          //     message: "Similarity score calculated successfully",
+          //     data: { averageScores, books: rankedBooks },
+          //     statusCode: 200,
+          //   })
+          // );
+
+          break;
+        }
+
+        default: {
+          return res.status(400).json(
+            createErrorResponse({
+              message: "Invalid conversation type",
+              statusCode: 400,
+            })
+          );
+        }
+      }
+
+      // Get AI response and save system message
+      const contextData = rankedBooks
+        .map(
+          (book, index) =>
+            `${index + 1}. Tên: ${book.name}, Tác giả: ${book.author}, Mô tả: ${
+              book.description
+            }`
+        )
+        .join("\n");
+
+      const finalPrompt = `
+      Bạn là một trợ lý thư viện ảo chuyên nghiệp và hữu ích, có khả năng hiểu và phân tích ngữ cảnh.
+      Hãy tạo câu trả lời phù hợp dựa trên truy vấn của người dùng và dữ liệu sách được xếp hạng dựa trên tính tương đồng ngữ cảnh.
+
+      [DỮ LIỆU ĐẦU VÀO]
+      Dưới đây là danh sách các cuốn sách liên quan nhất đã được tìm thấy dựa trên truy vấn của người dùng.
+      ${contextData}
+
+      [TRUY VẤN CỦA NGƯỜI DÙNG]
+      ${message}
+
+      [YÊU CẦU PHẢN HỒI]
+      1. Phản hồi một cách tự nhiên và nhiệt tình.
+      2. Bắt đầu bằng cách thừa nhận đã tìm thấy các đề xuất phù hợp.
+      3. Tổng hợp đầy đủ những cuốn sách trong phần [DỮ LIỆU ĐẦU VÀO] thành một danh sách đề xuất dễ đọc.
+      4. Trong danh sách đó, hãy sử dụng **Markdown In Đậm** cho cả **Tên sách** và **Tác giả** (ví dụ: 1. **Mưa Đỏ** của tác giả **Chu Lai**).
+      5. Không đề cập đến 'điểm tương đồng' (score) trong phản hồi cuối cùng.
+      `;
+
+      const systemResponse = await aiController.getChatResponse(finalPrompt);
       const newSystemMessage = new Message();
 
       newSystemMessage.content = systemResponse
@@ -148,19 +220,20 @@ class ConversationController {
         : "I'm sorry, I couldn't process your request.";
       newSystemMessage.conversationId = conversationId;
       newSystemMessage.role = "system";
-      newSystemMessage.data = data;
 
+      newSystemMessage.data.books =
+        rankedBooks.map((book) => book._id as string) || [];
       await newSystemMessage.save();
-
-      // Get conversation history
-      const historyMessages = await Message.find({
-        conversationId,
-      }).select("role content");
 
       return res.status(200).json(
         createSuccessResponse({
           message: "Message added to conversation successfully",
-          data: historyMessages,
+          data: {
+            ...newSystemMessage.toObject(),
+            data: {
+              books: rankedBooks,
+            },
+          },
           statusCode: 200,
         })
       );

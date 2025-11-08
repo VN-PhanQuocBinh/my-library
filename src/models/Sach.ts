@@ -5,17 +5,16 @@ import type { ISach, ImageInfo } from "../types/sach.ts";
 import { GENRES } from "../types/sach.ts";
 import { normalizeVietnamese } from "../utils/normalize-vietnamese.ts";
 import { generateEmbeddingWithHuggingFace } from "../services/ai.service.ts";
-
-const BOOK_SEARCH_INDEX_NAME = "book_vector_index";
+import { BOOK_EMBEDDING_CONFIG } from "../config/config.ts";
 
 const VECTOR_INDEX_DEFINITION = {
-  name: BOOK_SEARCH_INDEX_NAME,
+  name: BOOK_EMBEDDING_CONFIG.SEARCH_INDEX_NAME,
   type: "vectorSearch",
   definition: {
     fields: [
       {
-        path: "embeddingVector",
-        numDimensions: 1024,
+        path: BOOK_EMBEDDING_CONFIG.PATH,
+        numDimensions: BOOK_EMBEDDING_CONFIG.DIMENSION,
         similarity: "cosine",
         type: "vector",
       },
@@ -239,7 +238,7 @@ sachSchema.statics.createVectorSearchIndex = async function () {
 sachSchema.statics.dropVectorSearchIndex = async function () {
   try {
     const collection = mongoose.connection.collection("Sach");
-    await collection.dropSearchIndex(BOOK_SEARCH_INDEX_NAME);
+    await collection.dropSearchIndex(BOOK_EMBEDDING_CONFIG.SEARCH_INDEX_NAME);
     console.log("✅ Dropped Vector Search Index successfully.");
   } catch (error: any) {
     if (error.codeName === "IndexNotFound") {
