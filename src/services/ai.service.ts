@@ -8,6 +8,11 @@ const CURRENT_EMBEDDING_MODEL: EmbeddingModelType = "E5Large";
 const TEXT_MODEL = "gemini-2.0-flash";
 const googleGenAI = new GoogleGenAI({});
 
+export interface ChatHistory {
+  role: "user" | "model";
+  parts: { text: string }[];
+}
+
 export async function generateEmbeddingWithHuggingFace(prompt: string) {
   try {
     const output = await embeddingModels[CURRENT_EMBEDDING_MODEL](prompt);
@@ -34,12 +39,13 @@ export async function generateSentenceSimilarity(
 
 export async function generateChatResponse(
   systemPrompt: string,
-  userPrompt: string
+  userPrompt: string,
+  history: ChatHistory[] = []
 ) {
   try {
     const chat = await googleGenAI.chats.create({
       model: TEXT_MODEL,
-      history: [{ role: "model", parts: [{ text: userPrompt }] }],
+      history: [...history, { role: "model", parts: [{ text: userPrompt }] }],
       config: {
         systemInstruction: systemPrompt,
       },

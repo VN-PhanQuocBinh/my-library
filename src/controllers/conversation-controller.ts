@@ -1,23 +1,15 @@
 import Conversation from "../models/Conversation.ts";
 import Message from "../models/Message.ts";
-import type {
-  IMessage,
-  IConversation,
-  ConversationType,
-} from "../types/conversation.ts";
 import Sach from "../models/Sach.ts";
-
 import aiController from "./ai-controller.ts";
-
 import type { Request, Response } from "express";
 import {
   createSuccessResponse,
   createErrorResponse,
 } from "../utils/response.ts";
-
-import { calculateCosineSimilarity } from "../utils/calculate-cos-similarity.ts";
-
 import { BOOK_EMBEDDING_CONFIG } from "../config/config.ts";
+
+const MAX_MESSAGE_HISTORY = 10;
 
 class ConversationController {
   async createConversation(req: Request, res: Response) {
@@ -135,41 +127,21 @@ class ConversationController {
             },
           ];
           const recommendedBooks = await Sach.aggregate(pipeline);
-
-          // Calculate similarity scores
-          const sentences = recommendedBooks.map(
-            (book) =>
-              `Book name: ${book.name}.\nAuthor: ${book.author}.\nDescription: ${book.description}`
-          );
-          const similarityScores = await aiController.getSentenceSimilarity(
-            message,
-            sentences
-          );
-
-          // Rank books based on similarity scores
           const averageScores =
-            similarityScores.reduce((a: number, b: number) => a + b, 0) /
-            similarityScores.length;
+            recommendedBooks.reduce((acc, book) => acc + book.score, 0) /
+            recommendedBooks.length; // Since we are using vector search score directly
 
           // Store books with similarity score above average
-          similarityScores.forEach((score: number, index: number) => {
-            if (score >= averageScores && score > 0) {
+          recommendedBooks.forEach((book, index) => {
+            if (book.score >= averageScores && book.score > 0) {
               // Add score to passed book object
               const passedBook = recommendedBooks[index];
-              passedBook.score = score;
+              passedBook.score = book.score;
               rankedBooks.push(passedBook);
             }
           });
 
           rankedBooks = rankedBooks.sort((a: any, b: any) => b.score - a.score);
-          // return res.status(200).json(
-          //   createSuccessResponse({
-          //     message: "Similarity score calculated successfully",
-          //     data: { averageScores, books: rankedBooks },
-          //     statusCode: 200,
-          //   })
-          // );
-
           break;
         }
 
@@ -212,7 +184,18 @@ class ConversationController {
       5. Không đề cập đến 'điểm tương đồng' (score) trong phản hồi cuối cùng.
       `;
 
-      const systemResponse = await aiController.getChatResponse(finalPrompt);
+      // Retrieve recent chat history
+      const chatHistory = await Message.find({ conversationId })
+        .sort({ createdAt: -1 })
+        .limit(MAX_MESSAGE_HISTORY);
+
+      // Get AI response
+      const systemResponse = await aiController.getChatResponse(
+        finalPrompt,
+        chatHistory
+      );
+
+      // Save system message
       const newSystemMessage = new Message();
 
       newSystemMessage.content = systemResponse

@@ -4,6 +4,9 @@ import {
   generateChatResponse,
 } from "../services/ai.service.ts";
 
+import type { IMessage } from "../types/conversation.ts";
+import type { ChatHistory } from "../services/ai.service.ts";
+
 const systemPrompt = [
   "Bạn là Chatbot Thư viện thông minh, thân thiện.",
   "Hãy trả lời câu hỏi của người dùng và tạo ra một đoạn văn bản tự nhiên.",
@@ -43,13 +46,22 @@ class AIController {
     }
   }
 
-  async getChatResponse(prompt: string) {
+  async getChatResponse(prompt: string, history: IMessage[] = []) {
     try {
       if (!prompt) {
         throw new Error("Prompt is required");
       }
 
-      const chatResponse = await generateChatResponse(systemPrompt, prompt);
+      const formattedHistory: ChatHistory[] = history.map((msg) => ({
+        role: msg.role === "user" ? "user" : "model",
+        parts: [{ text: msg.content }],
+      }));
+
+      const chatResponse = await generateChatResponse(
+        systemPrompt,
+        prompt,
+        formattedHistory
+      );
       return chatResponse;
     } catch (error) {
       throw error;
