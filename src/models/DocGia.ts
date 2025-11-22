@@ -82,7 +82,7 @@ const DocGiaSchema = new Schema<IDocGia>(
 
 DocGiaSchema.virtual("isBanned").get(function (this: IDocGia) {
   if (!this.currentBanUntil) {
-    return true;
+    return false;
   }
   return this.currentBanUntil > new Date();
 });

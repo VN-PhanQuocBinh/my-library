@@ -3,7 +3,7 @@ import type { IDocGia, PenaltyRecord } from "../types/doc-gia.ts";
 
 import TheoDoiMuonSach from "../models/TheoDoiMuonSach.ts";
 import type { TheoDoiMuonSach as ITheoDoiMuonSach } from "../types/theo-doi-muon-sach.ts";
-import { Types } from "mongoose";
+import mongoose, { Types } from "mongoose";
 
 const FINE_PER_DAY = 5000;
 const BAN_THRESHOLD = 7;
@@ -48,7 +48,7 @@ export class PenaltyService {
       amount: fineAmount,
       reason: `Late return by ${daysLate} days`,
       type: "late-return",
-      borrowId: borrowRecord._id,
+      borrowId: borrowRecord._id as any,
       banUntilDate,
     };
 
