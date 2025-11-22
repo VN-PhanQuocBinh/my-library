@@ -8,6 +8,10 @@ import {
   createErrorResponse,
 } from "../utils/response.ts";
 import { BOOK_EMBEDDING_CONFIG } from "../config/config.ts";
+import {
+  SUGGESTION_PROMPT,
+  LIBRARY_FAQ_CONTENT,
+} from "../data/system-prompt.ts";
 
 const MAX_MESSAGE_HISTORY = 10;
 
@@ -86,9 +90,13 @@ class ConversationController {
       await newUserMessage.save();
 
       let rankedBooks: Record<string, string>[] = [];
+      let systemContextPrompt = "";
+
       // Handle conversation types
       switch (type) {
         case "SYSTEM_INFO": {
+          systemContextPrompt = LIBRARY_FAQ_CONTENT;
+
           break;
         }
 
@@ -142,6 +150,23 @@ class ConversationController {
           });
 
           rankedBooks = rankedBooks.sort((a: any, b: any) => b.score - a.score);
+          const contextData = rankedBooks
+            .map(
+              (book, index) =>
+                `${index + 1}. Tên: ${book.name}, Tác giả: ${
+                  book.author
+                }, Mô tả: ${book.description}`
+            )
+            .join("\n");
+
+          // Prepare system prompt with context data
+          systemContextPrompt = `
+            ${SUGGESTION_PROMPT}
+
+            [DỮ LIỆU ĐẦU VÀO]
+            Dưới đây là danh sách các cuốn sách liên quan nhất đã được tìm thấy dựa trên truy vấn của người dùng.
+            ${contextData}
+          `;
           break;
         }
 
@@ -156,32 +181,11 @@ class ConversationController {
       }
 
       // Get AI response and save system message
-      const contextData = rankedBooks
-        .map(
-          (book, index) =>
-            `${index + 1}. Tên: ${book.name}, Tác giả: ${book.author}, Mô tả: ${
-              book.description
-            }`
-        )
-        .join("\n");
-
       const finalPrompt = `
-      Bạn là một trợ lý thư viện ảo chuyên nghiệp và hữu ích, có khả năng hiểu và phân tích ngữ cảnh.
-      Hãy tạo câu trả lời phù hợp dựa trên truy vấn của người dùng và dữ liệu sách được xếp hạng dựa trên tính tương đồng ngữ cảnh.
+        ${systemContextPrompt}
 
-      [DỮ LIỆU ĐẦU VÀO]
-      Dưới đây là danh sách các cuốn sách liên quan nhất đã được tìm thấy dựa trên truy vấn của người dùng.
-      ${contextData}
-
-      [TRUY VẤN CỦA NGƯỜI DÙNG]
-      ${message}
-
-      [YÊU CẦU PHẢN HỒI]
-      1. Phản hồi một cách tự nhiên và nhiệt tình.
-      2. Bắt đầu bằng cách thừa nhận đã tìm thấy các đề xuất phù hợp.
-      3. Tổng hợp đầy đủ những cuốn sách trong phần [DỮ LIỆU ĐẦU VÀO] thành một danh sách đề xuất dễ đọc.
-      4. Trong danh sách đó, hãy sử dụng **Markdown In Đậm** cho cả **Tên sách** và **Tác giả** (ví dụ: 1. **Mưa Đỏ** của tác giả **Chu Lai**).
-      5. Không đề cập đến 'điểm tương đồng' (score) trong phản hồi cuối cùng.
+        [TRUY VẤN CỦA NGƯỜI DÙNG]
+        ${message}
       `;
 
       // Retrieve recent chat history

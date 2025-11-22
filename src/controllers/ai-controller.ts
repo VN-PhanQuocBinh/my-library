@@ -7,15 +7,10 @@ import {
 import type { IMessage } from "../types/conversation.ts";
 import type { ChatHistory } from "../services/ai.service.ts";
 
-const systemPrompt = [
-  "Bạn là Chatbot Thư viện thông minh, thân thiện.",
-  "Hãy trả lời câu hỏi của người dùng và tạo ra một đoạn văn bản tự nhiên.",
-  "Nội dung văn bản (responseText) phải sử dụng định dạng Markdown (ví dụ: **in đậm**, dấu `*` hoặc `1.` cho danh sách) để văn bản dễ đọc và có cấu trúc.",
-  "Tuyệt đối không nhắc đến 'score' hay 'điểm phù hợp'.",
-  "Sử dụng ngôn ngữ theo ngôn ngữ của người dùng.",
-].join(" ");
+import { SYSTEM_PROMPT } from "../data/system-prompt.ts";
 
 class AIController {
+  // Generate embedding for a given prompt
   async generateEmbedding(prompt: string) {
     try {
       if (!prompt) {
@@ -30,6 +25,7 @@ class AIController {
     }
   }
 
+  // Get similarity score between a source sentence and an array of sentences
   async getSentenceSimilarity(source: string, sentences: string[]) {
     try {
       if (!source || sentences.length === 0) {
@@ -46,6 +42,7 @@ class AIController {
     }
   }
 
+  // Generate chat response based on prompt and chat history
   async getChatResponse(prompt: string, history: IMessage[] = []) {
     try {
       if (!prompt) {
@@ -58,7 +55,7 @@ class AIController {
       }));
 
       const chatResponse = await generateChatResponse(
-        systemPrompt,
+        SYSTEM_PROMPT,
         prompt,
         formattedHistory
       );
