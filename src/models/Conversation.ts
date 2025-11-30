@@ -1,9 +1,10 @@
 import mongoose from "mongoose";
-import type { IConversation, IMessage } from "../types/conversation.ts";
-import Message from "./Message.ts";
+import type { IConversation } from "../types/conversation.ts";
 
 const conversationSchema = new mongoose.Schema<IConversation>(
-  {},
+  {
+    user: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
+  },
   {
     timestamps: true,
   }
