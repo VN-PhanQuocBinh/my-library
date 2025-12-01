@@ -315,6 +315,91 @@ class ConversationController {
       );
     }
   }
+
+  async getAllConversations(req: Request, res: Response) {
+    try {
+      const userId = req.user?._id;
+
+      if (!userId) {
+        return res.status(400).json(
+          createErrorResponse({
+            message: "User ID is required",
+            statusCode: 400,
+          })
+        );
+      }
+
+      const conversations = await Conversation.find({ user: userId });
+
+      return res.status(200).json(
+        createSuccessResponse({
+          message: "All conversations retrieved successfully",
+          data: conversations,
+          statusCode: 200,
+        })
+      );
+    } catch (error) {
+      console.error("Error retrieving all conversations:", error);
+      return res.status(500).json(
+        createErrorResponse({
+          message: "Failed to retrieve all conversations",
+          statusCode: 500,
+          additionalData: error,
+        })
+      );
+    }
+  }
+
+  async renameConversation(req: Request, res: Response) {
+    try {
+      const userId = req.user?._id;
+      const { newTitle } = req.body;
+      const { id: conversationId } = req.params;
+
+      if (!userId) {
+        return res.status(400).json(
+          createErrorResponse({
+            message: "User ID is required",
+            statusCode: 400,
+          })
+        );
+      }
+
+      const conversation = await Conversation.findOne({
+        _id: conversationId,
+        user: userId,
+      });
+
+      if (!conversation) {
+        return res.status(404).json(
+          createErrorResponse({
+            message: "Conversation not found",
+            statusCode: 404,
+          })
+        );
+      }
+
+      conversation.title = newTitle;
+      await conversation.save();
+
+      return res.status(200).json(
+        createSuccessResponse({
+          message: "Conversation renamed successfully",
+          data: conversation,
+          statusCode: 200,
+        })
+      );
+    } catch (error) {
+      console.error("Error renaming conversation:", error);
+      return res.status(500).json(
+        createErrorResponse({
+          message: "Failed to rename conversation",
+          statusCode: 500,
+          additionalData: error,
+        })
+      );
+    }
+  }
 }
 
 export default new ConversationController();

@@ -15,6 +15,7 @@ export interface IMessage {
 
 export interface IConversation {
   _id?: string;
+  title: string;
   user: mongo.ObjectId;
 
   createdAt?: Date;
