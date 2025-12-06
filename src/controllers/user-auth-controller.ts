@@ -5,6 +5,8 @@ import DocGia from "../models/DocGia.ts";
 import type { IDocGiaWithId } from "../types/doc-gia.ts";
 import { Error } from "mongoose";
 import { JWT_SECRET, JWT_EXPIRES } from "../config/env.ts";
+import blackListController from "./black-list-controller.ts";
+import getToken from "../services/get-token.service.ts";
 
 import {
   formatUserResponse,
@@ -273,8 +275,29 @@ class UserAuthController {
     }
   }
 
-  logout(req: Request, res: Response, next: NextFunction) {
-    return res.status(200).json({ message: "Đăng xuất thành công." });
+  async logout(req: Request, res: Response, next: NextFunction) {
+    try {
+      const token = getToken(req);
+
+      if (token) {
+        await blackListController.addToBlacklist(token);
+      }
+
+      res.clearCookie("token");
+
+      return res.status(200).json(
+        createSuccessResponse({
+          message: "Đăng xuất thành công",
+        })
+      );
+    } catch (error) {
+      return res.status(500).json(
+        createErrorResponse({
+          message: "Lỗi khi đăng xuất",
+          statusCode: 500,
+        })
+      );
+    }
   }
 }
 

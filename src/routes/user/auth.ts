@@ -7,7 +7,7 @@ import readerAuthController from "../../controllers/user-auth-controller.ts";
 
 router.post("/register", readerAuthController.register);
 router.post("/login", readerAuthController.login);
-router.post("/logout", readerAuthController.logout);
+router.post("/logout", requireAuth, readerAuthController.logout);
 router.get("/profile", requireAuth, readerAuthController.getProfile);
 router.patch("/profile/:id", requireAuth, readerAuthController.updateProfile);
 

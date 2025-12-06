@@ -8,6 +8,12 @@ const TheoDoiMuonSachSchema = new mongoose.Schema<TheoDoiMuonSach>(
       ref: "DocGia",
       required: true,
     },
+    staffId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "NhanVien",
+      required: false,
+      default: null,
+    },
     bookId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Sach",

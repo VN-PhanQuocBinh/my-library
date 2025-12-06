@@ -14,7 +14,7 @@ const conversationSchema = new mongoose.Schema<IConversation>(
 const Conversation = mongoose.model(
   "Conversation",
   conversationSchema,
-  "Conversation"
+  "HoiThoai"
 );
 
 export default Conversation;
