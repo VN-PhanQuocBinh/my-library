@@ -13,6 +13,9 @@ import {
 } from "../utils/response.ts";
 
 import { PenaltyService } from "../services/penalty.service.ts";
+import mongoose from "mongoose";
+
+const MAX_BOOK_BORROW = 5;
 
 // Map defining quantity changes for valid state transitions
 const changeValue = new Map<`${borrowingStatus}-${borrowingStatus}`, number>()
@@ -200,6 +203,20 @@ class BookBorrowingController {
         });
       }
 
+      const userBorrowCount = await TheoDoiMuonSach.countDocuments({
+        userId,
+        status: { $in: ["pending", "approved", "overdue", "lost"] },
+      });
+
+      if (userBorrowCount >= MAX_BOOK_BORROW) {
+        return generateErrorResponse({
+          res,
+          statusCode: 400,
+          message: "Borrowing limit reached",
+          errorDetails: "User has reached the maximum number of borrowed books",
+        });
+      }
+
       const newBorrowing = new TheoDoiMuonSach({
         userId,
         bookId,
@@ -228,6 +245,7 @@ class BookBorrowingController {
     try {
       const borrowingId = req.params.id;
       const { status } = req.body;
+      const staffId = req.user?._id;
 
       // Find the borrowing record
       const borrowing = await TheoDoiMuonSach.findById(borrowingId);
@@ -278,6 +296,7 @@ class BookBorrowingController {
       }
 
       borrowing.status = status;
+      borrowing.staffId = staffId as unknown as mongoose.Schema.Types.ObjectId;
       await PenaltyService.calculateAndApplyPenalties(borrowingId || "");
 
       await borrowing.save();

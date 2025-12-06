@@ -215,6 +215,7 @@ class BookController {
         "publisher",
         searchOption
       );
+
       return generateSuccessResponse({
         res,
         message: "Books retrieved successfully",

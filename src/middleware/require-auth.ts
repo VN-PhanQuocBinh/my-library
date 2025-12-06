@@ -4,32 +4,37 @@ import type { INhanVienWithId } from "../types/user-schema.ts";
 import type { IDocGiaWithId } from "../types/user-schema.ts";
 import type { Request, Response, NextFunction } from "express";
 import jwt from "jsonwebtoken";
+import blackListController from "../controllers/black-list-controller.ts";
 
 import { createErrorResponse } from "../utils/response.ts";
 import { JWT_SECRET } from "../config/env.ts";
+
+import getToken from "../services/get-token.service.ts";
 
 export default async function (
   req: Request & { user?: IDocGiaWithId | INhanVienWithId },
   res: Response,
   next: NextFunction
 ) {
-  let token;
-
   try {
-    if (
-      req.headers.authorization &&
-      req.headers.authorization.startsWith("Bearer")
-    ) {
-      token = req.headers.authorization.split(" ")[1];
-    } else if (req.cookies?.token) {
-      token = req.cookies.token;
-    }
+    const token = getToken(req);
 
     if (!token) {
       const code = 401;
       return res.status(code).json(
         createErrorResponse({
           message: "Token is required",
+          statusCode: code,
+        })
+      );
+    }
+
+    const isBlacklisted = await blackListController.isBlacklisted(token);
+    if (isBlacklisted) {
+      const code = 401;
+      return res.status(code).json(
+        createErrorResponse({
+          message: "Token has been revoked",
           statusCode: code,
         })
       );

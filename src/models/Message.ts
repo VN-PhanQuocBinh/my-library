@@ -24,6 +24,6 @@ const messageSchema = new mongoose.Schema<IMessage>(
   { timestamps: true }
 );
 
-const Message = mongoose.model("Message", messageSchema, "Message");
+const Message = mongoose.model("Message", messageSchema, "TinNhan");
 
 export default Message;
