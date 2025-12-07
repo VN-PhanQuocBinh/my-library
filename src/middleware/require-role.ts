@@ -1,22 +1,14 @@
 import type { NextFunction, RequestHandler, Request, Response } from "express";
-import {
-  createSuccessResponse,
-  createErrorResponse,
-} from "../utils/response.ts";
+import { createErrorResponse } from "../utils/response.ts";
 
-import DocGia from "../models/DocGia.ts";
-import NhanVien from "../models/NhanVien.ts";
-import type { IDocGiaWithId } from "../types/user-schema.ts";
-import type { INhanVienWithId } from "../types/user-schema.ts";
+import type { UserRole } from "../types/common.ts";
 
-export default function requireRole(
-  roles: ("reader" | "admin")[]
-): RequestHandler | void {
+export default function requireRole(roles: UserRole[]): RequestHandler | void {
   try {
     return async (req: Request, res: Response, next: NextFunction) => {
       try {
         const userRole = req.user?.role;
-        console.log("User role:", roles, userRole)
+        console.log("User role:", roles, userRole);
         if (!userRole) {
           return res.status(401).json(
             createErrorResponse({

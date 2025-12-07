@@ -2,6 +2,7 @@ import {
   generateEmbeddingWithHuggingFace,
   generateSentenceSimilarity,
   generateChatResponse,
+  generateChatResponseV2,
 } from "../services/ai.service.ts";
 
 import type { IMessage } from "../types/conversation.ts";
@@ -32,10 +33,7 @@ class AIController {
         throw new Error("Source and sentences are required");
       }
 
-      const similarityResponse = await generateSentenceSimilarity(
-        source,
-        sentences
-      );
+      const similarityResponse = await generateSentenceSimilarity(source, sentences);
       return similarityResponse;
     } catch (error) {
       throw new Error("Failed to get sentence similarity");
@@ -54,11 +52,7 @@ class AIController {
         parts: [{ text: msg.content }],
       }));
 
-      const chatResponse = await generateChatResponse(
-        SYSTEM_PROMPT,
-        prompt,
-        formattedHistory
-      );
+      const chatResponse = await generateChatResponse(SYSTEM_PROMPT, prompt, formattedHistory);
       return chatResponse;
     } catch (error) {
       throw error;

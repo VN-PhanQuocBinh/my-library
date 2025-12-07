@@ -14,7 +14,7 @@ import removeEmbeddings from "./src/scripts/remove-embeddings.ts";
 // connect to database
 import db from "./src/config/db.ts";
 db.connect();
-Sach.createVectorSearchIndex(); 
+// Sach.createVectorSearchIndex(); 
 // Sach.dropVectorSearchIndex()
 
 

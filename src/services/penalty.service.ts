@@ -21,17 +21,13 @@ export class PenaltyService {
       throw new Error("User not found");
     }
 
-    const borrowedAt = borrowRecord.borrowedAt
-      ? new Date(borrowRecord.borrowedAt)
-      : new Date();
-    const returnedAt = borrowRecord.returnedAt
-      ? new Date(borrowRecord.returnedAt)
-      : new Date();
+    const borrowedAt = borrowRecord.borrowedAt ? new Date(borrowRecord.borrowedAt) : new Date();
+    const returnedAt = borrowRecord.returnedAt ? new Date(borrowRecord.returnedAt) : new Date();
     const maxBorrowDays = borrowRecord.maxBorrowDays || 14;
     const daysLate =
-      Math.ceil(
-        (returnedAt.getTime() - borrowedAt.getTime()) / (1000 * 3600 * 24)
-      ) - maxBorrowDays;
+      Math.ceil((returnedAt.getTime() - borrowedAt.getTime()) / (1000 * 3600 * 24)) - maxBorrowDays;
+
+    console.log(`Days late for borrow ID ${borrowId}: ${daysLate}`);
 
     if (daysLate <= 0) {
       return user;
@@ -65,11 +61,7 @@ export class PenaltyService {
       updatePayload.$set = { currentBanUntil: newBanUntil, status: "banned" };
     }
 
-    const updatedUser = await DocGia.findByIdAndUpdate(
-      user._id,
-      updatePayload,
-      { new: true }
-    );
+    const updatedUser = await DocGia.findByIdAndUpdate(user._id, updatePayload, { new: true });
     return updatedUser;
   }
 }
