@@ -3,15 +3,10 @@ import Message from "../models/Message.ts";
 import Sach from "../models/Sach.ts";
 import aiController from "./ai-controller.ts";
 import type { Request, Response } from "express";
-import {
-  createSuccessResponse,
-  createErrorResponse,
-} from "../utils/response.ts";
+import { createSuccessResponse, createErrorResponse } from "../utils/response.ts";
 import { BOOK_EMBEDDING_CONFIG } from "../config/config.ts";
-import {
-  SUGGESTION_PROMPT,
-  LIBRARY_FAQ_CONTENT,
-} from "../data/system-prompt.ts";
+import { SUGGESTION_PROMPT, LIBRARY_FAQ_CONTENT } from "../data/system-prompt.ts";
+import { set } from "mongoose";
 
 const MAX_MESSAGE_HISTORY = 10;
 
@@ -135,7 +130,6 @@ class ConversationController {
       switch (type) {
         case "SYSTEM_INFO": {
           systemContextPrompt = LIBRARY_FAQ_CONTENT;
-
           break;
         }
 
@@ -175,8 +169,7 @@ class ConversationController {
           ];
           const recommendedBooks = await Sach.aggregate(pipeline);
           const averageScores =
-            recommendedBooks.reduce((acc, book) => acc + book.score, 0) /
-            recommendedBooks.length; // Since we are using vector search score directly
+            recommendedBooks.reduce((acc, book) => acc + book.score, 0) / recommendedBooks.length; // Since we are using vector search score directly
 
           // Store books with similarity score above average
           recommendedBooks.forEach((book, index) => {
@@ -192,9 +185,9 @@ class ConversationController {
           const contextData = rankedBooks
             .map(
               (book, index) =>
-                `${index + 1}. Tên: ${book.name}, Tác giả: ${
-                  book.author
-                }, Mô tả: ${book.description}`
+                `${index + 1}. Tên: ${book.name}, Tác giả: ${book.author}, Mô tả: ${
+                  book.description
+                }`
             )
             .join("\n");
 
@@ -233,10 +226,7 @@ class ConversationController {
         .limit(MAX_MESSAGE_HISTORY);
 
       // Get AI response
-      const systemResponse = await aiController.getChatResponse(
-        finalPrompt,
-        chatHistory
-      );
+      const systemResponse = await aiController.getChatResponse(finalPrompt, chatHistory);
 
       // Save system message
       const newSystemMessage = new Message();
@@ -247,8 +237,7 @@ class ConversationController {
       newSystemMessage.conversationId = conversationId;
       newSystemMessage.role = "system";
 
-      newSystemMessage.data.books =
-        rankedBooks.map((book) => book._id as string) || [];
+      newSystemMessage.data.books = rankedBooks.map((book) => book._id as string) || [];
       await newSystemMessage.save();
 
       return res.status(200).json(
@@ -290,9 +279,7 @@ class ConversationController {
         );
       }
 
-      const messages = await Message.find({ conversationId }).populate(
-        "data.books"
-      );
+      const messages = await Message.find({ conversationId }).populate("data.books");
 
       return res.status(200).json(
         createSuccessResponse({

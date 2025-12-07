@@ -1,11 +1,17 @@
 import { GoogleGenAI } from "@google/genai";
 import type { EmbeddingModelType } from "../config/config.ts";
 import embeddingModels from "./embedding.service.ts";
+
+import { InferenceClient } from "@huggingface/inference";
+
 import dotenv from "dotenv";
 dotenv.config();
+// console.log("HF Token:", process.env.HF_TOKEN);
+
+const client = new InferenceClient(process.env.HF_TOKEN);
 
 const CURRENT_EMBEDDING_MODEL: EmbeddingModelType = "E5Large";
-const TEXT_MODEL = "gemini-2.0-flash";
+const TEXT_MODEL = "gemini-2.5-flash-lite"; // or "gemini-2.5-flash" -> restart server after change
 const googleGenAI = new GoogleGenAI({});
 
 export interface ChatHistory {
@@ -53,6 +59,30 @@ export async function generateChatResponse(
 
     const responseText = await chat.sendMessage({ message: userPrompt });
     return responseText.text;
+  } catch (error) {
+    throw error;
+  }
+}
+
+// Test
+export async function generateChatResponseV2(
+  systemPrompt: string,
+  userPrompt: string,
+  history: ChatHistory[] = []
+) {
+  try {
+    const chatCompletion = await client.chatCompletion({
+      model: "deepseek-ai/DeepSeek-R1:novita",
+      tool_prompt: systemPrompt,
+      messages: [
+        {
+          role: "user",
+          content: userPrompt,
+        },
+      ],
+    });
+
+    return chatCompletion.choices[0]?.message;
   } catch (error) {
     throw error;
   }

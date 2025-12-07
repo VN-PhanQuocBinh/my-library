@@ -48,7 +48,7 @@ export default async function (
       req.user = {
         ...admin.toObject(),
         _id: admin._id.toString(),
-        role: "admin",
+        role: admin.toObject().duty,
       };
       return next();
     }

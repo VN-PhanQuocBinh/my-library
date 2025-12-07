@@ -9,56 +9,54 @@ import checkStatusMiddleware from "../middleware/check-status.ts";
 
 const router = express.Router();
 
-router.get("/borrowings", requireAuth, bookBorrowigController.getAllBorrowings);
-
-// Routes for book borrowing (admin)
-router.post(
-  "/borrow",
-  requireAuth,
-  requireRole(["admin"]) as express.RequestHandler,
-  bookBorrowigController.borrowBook
-);
-
-// Routes for book borrowing (reader)
-router.post(
-  "/register-borrow",
+const userAuth = [
   requireAuth,
   checkStatusMiddleware,
   requireRole(["reader"]) as express.RequestHandler,
-  bookBorrowigController.registerBorrowing
-);
-router.patch(
-  "/borrow/:id",
-  requireAuth,
-  bookBorrowigController.updateBorrowing
-);
-router.get(
-  "/my-borrowings",
-  requireAuth,
-  requireRole(["reader"]) as express.RequestHandler,
-  bookBorrowigController.getUserBorrowings
-);
+];
 
+const adminAuth = [requireAuth, requireRole(["staff", "manager"]) as express.RequestHandler];
 
-// Routes for book management
+router.get("/borrowings", ...adminAuth, bookBorrowigController.getAllBorrowings);
+
+// [ADMIN] Routes for book borrowing
+router.post("/borrow", ...adminAuth, bookBorrowigController.borrowBook);
+
+// [USER] Routes for book borrowing
+router.post("/register-borrow", ...userAuth, bookBorrowigController.registerBorrowing);
+
+// [ADMIN] Routes for updating borrowings
+router.patch("/borrow/:id", ...adminAuth, bookBorrowigController.updateBorrowing);
+
+// [USER] Routes for getting user's borrowings
+router.get("/my-borrowings", ...userAuth, bookBorrowigController.getUserBorrowings);
+
+// [ADMIN] Routes for book management
 router.post(
   "/create",
+  requireAuth,
+  requireRole(["manager"]) as express.RequestHandler,
   upload.fields([
     { name: "coverImage", maxCount: 1 },
     { name: "detailedImages", maxCount: 10 },
   ]),
   BookController.createBook as express.RequestHandler
 );
-router.get("/list", BookController.getAllBooks);
+
+router.get("/list", requireAuth, BookController.getAllBooks);
+
 router.patch(
   "/:id/update",
+  requireAuth,
+  requireRole(["manager"]) as express.RequestHandler,
   upload.fields([
     { name: "coverImage", maxCount: 1 },
     { name: "detailedImages", maxCount: 10 },
   ]),
   BookController.updateBook as express.RequestHandler
 );
-router.get("/:id", BookController.getBookById);
-router.post("/return/:id", bookBorrowigController.returnBook);
+
+router.get("/:id", requireAuth, BookController.getBookById);
+router.post("/return/:id", ...adminAuth, bookBorrowigController.returnBook);
 
 export default router;

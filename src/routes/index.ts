@@ -10,7 +10,6 @@ import adminRouter from "./admin/admins.ts";
 import testRouter from "./test.ts";
 
 import { type Express } from "express";
-import requireAuth from "../middleware/require-auth.ts";
 
 function routes(app: Express) {
   app.use("/api/test", testRouter);
@@ -22,8 +21,7 @@ function routes(app: Express) {
   app.use("/api/auth", userAuthRouter);
   app.use("/api/publisher", publisherRouter);
   app.use("/api/book", bookRouter);
-  // app.use("/api/ai", aiRouter);
-  app.use("/api/conversation", requireAuth, conversationRouter);
+  app.use("/api/conversation", conversationRouter);
 }
 
 export default routes;

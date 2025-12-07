@@ -50,6 +50,10 @@ const updateBorrowingStatus = async (borrowing: ITheoDoiMuonSach) => {
   returnDate.setDate(returnDate.getDate() + (borrowing.maxBorrowDays || 14));
 
   const isOverdue = new Date() > returnDate;
+  // if (isOverdue) {
+  //   PenaltyService.calculateAndApplyPenalties(borrowing._id as any);
+  // }
+
   if (isOverdue && changeValue.has(`${borrowing.status}-overdue`)) {
     borrowing.status = "overdue";
 

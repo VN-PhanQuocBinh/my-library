@@ -25,8 +25,6 @@ export default async function checkStatusMiddleware(
     if (user.role === "reader" && user.isBanned) {
       const bannedUntil = (user as IDocGiaWithId).currentBanUntil;
 
-      console.log("Banned until:", bannedUntil);
-
       return res.status(403).json(
         createErrorResponse({
           message: "User is banned",
