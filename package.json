@@ -6,7 +6,8 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "node server.ts",
-    "dev": "nodemon server.ts"
+    "dev": "nodemon server.ts",
+    "build": "tsc"
   },
   "author": "",
   "license": "ISC",
@@ -14,6 +15,7 @@
   "dependencies": {
     "@google/genai": "^1.27.0",
     "@huggingface/inference": "^4.13.4",
+    "@sindresorhus/slugify": "^3.0.0",
     "axios": "^1.12.2",
     "bcryptjs": "^3.0.2",
     "cloudinary": "^2.7.0",

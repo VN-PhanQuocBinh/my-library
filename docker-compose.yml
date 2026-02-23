@@ -1,0 +1,13 @@
+version: "3.8"
+
+services:
+  app:
+    build: .
+    container_name: my-library-backend
+    ports:
+      - "3001:3001"
+    env_file:
+      - .env
+    volumes:
+      - ./services/app:/app
+      - /app/node_modules

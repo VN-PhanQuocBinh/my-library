@@ -1,6 +1,5 @@
 import mongoose from "mongoose";
-// import slugify from "slugify";
-import slugify from "slugify";
+import slugify from "@sindresorhus/slugify";
 import type { ISach, ImageInfo } from "../types/sach.ts";
 import { GENRES } from "../types/sach.ts";
 import { normalizeVietnamese } from "../utils/normalize-vietnamese.ts";
@@ -136,7 +135,7 @@ const sachSchema = new mongoose.Schema<ISach>(
   },
   {
     timestamps: true,
-  }
+  },
 );
 
 sachSchema.index({
@@ -148,15 +147,10 @@ sachSchema.index({
 sachSchema.pre("save", async function (next) {
   if (this.isModified("name")) {
     let newSlug: string = slugify(this.name, {
-      lower: true,
-      strict: true,
-      remove: /[*+~.()'"!:@]/g,
       locale: "vi",
     });
 
-    const existingBookWithSlug = await mongoose
-      .model("Sach")
-      .findOne({ slug: newSlug });
+    const existingBookWithSlug = await mongoose.model("Sach").findOne({ slug: newSlug });
 
     if (existingBookWithSlug) {
       newSlug = `${newSlug}-${Date.now().toString()}`;
@@ -183,11 +177,7 @@ sachSchema.pre("save", function (next) {
 });
 
 sachSchema.pre("save", async function (next) {
-  if (
-    this.isModified("name") ||
-    this.isModified("author") ||
-    this.isModified("description")
-  ) {
+  if (this.isModified("name") || this.isModified("author") || this.isModified("description")) {
     const textToEmbed = `Book name: ${this.name}.\nAuthor: ${this.author}.\nDescription: ${this.description}`;
     const embedding = await generateEmbeddingWithHuggingFace(textToEmbed);
 
@@ -226,9 +216,7 @@ sachSchema.statics.createVectorSearchIndex = async function () {
     console.log("✅ Created Vector Search Index successfully.");
   } catch (error: any) {
     if (error.codeName === "IndexAlreadyExists") {
-      console.log(
-        "⚠️ Vector Search Index already exists, skipping index creation."
-      );
+      console.log("⚠️ Vector Search Index already exists, skipping index creation.");
     } else {
       console.error("❌ Error creating Vector Search Index:", error);
     }
