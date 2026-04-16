@@ -1,7 +1,7 @@
-import publisherController from "../controllers/publisher-controller.ts";
+import publisherController from "../controllers/publisher-controller";
 import express from "express";
-import requireAuth from "../middleware/require-auth.ts";
-import requireRole from "../middleware/require-role.ts";
+import requireAuth from "../middleware/require-auth";
+import requireRole from "../middleware/require-role";
 
 const router = express.Router();
 

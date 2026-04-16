@@ -7,8 +7,12 @@
 
     // Environment Settings
     // See also https://aka.ms/tsconfig/module
-    "module": "nodenext",
-    "target": "esnext",
+    "module": "es2022",
+    "target": "es2022",
+    "moduleResolution": "node",
+    "esModuleInterop": true,
+    "forceConsistentCasingInFileNames": true,
+    "resolveJsonModule": true,
     "types": [],
     // For nodejs:
     // "lib": ["esnext"],
@@ -32,19 +36,37 @@
     // "noFallthroughCasesInSwitch": true,
     // "noPropertyAccessFromIndexSignature": true,
 
-
     "typeRoots": ["./node_modules/@types", "./src/types"],
 
     // Recommended Options
-    "noEmit": true,
+    "noEmit": false,
     "strict": true,
     "jsx": "react-jsx",
     "verbatimModuleSyntax": true,
     "isolatedModules": true,
     "noUncheckedSideEffectImports": true,
-    "allowImportingTsExtensions": true,
+    // "allowImportingTsExtensions": true,
     "moduleDetection": "force",
     "skipLibCheck": true
   },
-  "include": ["src/**/*"]
+  "tsc-alias": {
+    "verbose": false,
+    "resolveFullPaths": true,
+    "replacers": {
+      "exampleReplacer": {
+        "enabled": true,
+        // "file": "./exampleReplacer.js"
+      },
+      "otherReplacer": {
+        "enabled": true,
+        // "file": "./otherReplacer.js"
+      }
+    },
+    "fileExtensions": {
+      "inputGlob": "{js,jsx,mjs}",
+      "outputCheck": ["js", "json", "jsx", "mjs"]
+    }
+  },
+  "include": ["src/**/*"],
+  "exclude": ["node_modules", "dist"]
 }

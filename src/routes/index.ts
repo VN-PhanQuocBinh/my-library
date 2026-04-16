@@ -1,13 +1,13 @@
-import userAuthRouter from "./user/auth.ts";
-import adminAuthRouter from "./admin/auth.ts";
-import publisherRouter from "./publisher.ts";
-import bookRouter from "./book.ts";
-import conversationRouter from "./conversation.ts";
+import userAuthRouter from "./user/auth";
+import adminAuthRouter from "./admin/auth";
+import publisherRouter from "./publisher";
+import bookRouter from "./book";
+import conversationRouter from "./conversation";
 
-import userRouter from "./admin/user.ts";
-import adminRouter from "./admin/admins.ts";
+import userRouter from "./admin/user";
+import adminRouter from "./admin/admins";
 
-import testRouter from "./test.ts";
+import testRouter from "./test";
 
 import { type Express } from "express";
 

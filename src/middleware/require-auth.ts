@@ -1,15 +1,15 @@
-import DocGia from "../models/DocGia.ts";
-import NhanVien from "../models/NhanVien.ts";
-import type { INhanVienWithId } from "../types/user-schema.ts";
-import type { IDocGiaWithId } from "../types/user-schema.ts";
+import DocGia from "../models/DocGia";
+import NhanVien from "../models/NhanVien";
+import type { INhanVienWithId } from "../types/user-schema";
+import type { IDocGiaWithId } from "../types/user-schema";
 import type { Request, Response, NextFunction } from "express";
 import jwt from "jsonwebtoken";
-import blackListController from "../controllers/black-list-controller.ts";
+import blackListController from "../controllers/black-list-controller";
 
-import { createErrorResponse } from "../utils/response.ts";
-import { JWT_SECRET } from "../config/env.ts";
+import { createErrorResponse } from "../utils/response";
+import { JWT_SECRET } from "../config/env";
 
-import getToken from "../services/get-token.service.ts";
+import getToken from "../services/get-token.service";
 
 export default async function (
   req: Request & { user?: IDocGiaWithId | INhanVienWithId },

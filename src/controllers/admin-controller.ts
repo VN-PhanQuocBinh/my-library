@@ -1,5 +1,5 @@
-import NhanVien from "../models/NhanVien.ts";
-import paginate from "../utils/paginate.ts";
+import NhanVien from "../models/NhanVien";
+import paginate from "../utils/paginate";
 import bcrypt from "bcryptjs";
 
 import type { Response, Request } from "express";
@@ -8,14 +8,14 @@ import jwt from "jsonwebtoken";
 import {
   generateErrorResponse,
   generateSuccessResponse,
-} from "../utils/response.ts";
+} from "../utils/response";
 
-import { formatUserResponse } from "../utils/response.ts";
+import { formatUserResponse } from "../utils/response";
 
-import type { INhanVienWithId } from "../types/nhan-vien.ts";
-import type { StaffJWTPayload } from "../types/request.ts";
+import type { INhanVienWithId } from "../types/nhan-vien";
+import type { StaffJWTPayload } from "../types/request";
 
-import { createSearchOptions } from "../utils/create-search-options.ts";
+import { createSearchOptions } from "../utils/create-search-options";
 
 const JWT_SECRET = process.env.JWT_SECRET || "dev_secret";
 const JWT_EXPIRES = process.env.JWT_EXPIRES || "1 day";

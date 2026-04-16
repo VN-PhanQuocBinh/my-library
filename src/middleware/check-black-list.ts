@@ -1,7 +1,7 @@
 import type { Request, Response, NextFunction } from "express";
-import Blacklist from "../models/Blacklist.ts";
-import { createErrorResponse } from "../utils/response.ts";
-import getToken from "../services/get-token.service.ts";
+import Blacklist from "../models/Blacklist";
+import { createErrorResponse } from "../utils/response";
+import getToken from "../services/get-token.service";
 
 export default async function checkBlacklist(
   req: Request,

@@ -1,4 +1,4 @@
-import type { EmbeddingModelType } from "../config/config.ts";
+import type { EmbeddingModelType } from "../config/config";
 
 const embeddingModelsLink = [
   "https://router.huggingface.co/hf-inference/models/intfloat/multilingual-e5-large/pipeline/feature-extraction",

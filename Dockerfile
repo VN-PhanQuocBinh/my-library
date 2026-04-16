@@ -15,6 +15,9 @@ COPY . .
 # Build TypeScript
 RUN npm run build
 
+# Verify build output
+RUN ls -la /app/dist
+
 # Production stage
 FROM node:24.12.0-slim
 
@@ -28,10 +31,9 @@ RUN npm install --only=production
 
 # Copy built files from builder
 COPY --from=builder /app/dist ./dist
-COPY --from=builder /app/server.ts ./
 
 # Expose port
 EXPOSE 3001
 
-# Start server
-CMD ["node", "server.ts"]
+# Start server - chạy file JS đã compiled
+CMD ["node", "dist/server.js"]

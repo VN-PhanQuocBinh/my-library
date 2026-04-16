@@ -1,10 +1,10 @@
 import mongoose from "mongoose";
 import slugify from "@sindresorhus/slugify";
-import type { ISach, ImageInfo } from "../types/sach.ts";
-import { GENRES } from "../types/sach.ts";
-import { normalizeVietnamese } from "../utils/normalize-vietnamese.ts";
-import { generateEmbeddingWithHuggingFace } from "../services/ai.service.ts";
-import { BOOK_EMBEDDING_CONFIG } from "../config/config.ts";
+import type { ISach, ImageInfo } from "../types/sach";
+import { GENRES } from "../types/sach";
+import { normalizeVietnamese } from "../utils/normalize-vietnamese";
+import { generateEmbeddingWithHuggingFace } from "../services/ai.service";
+import { BOOK_EMBEDDING_CONFIG } from "../config/config";
 
 const VECTOR_INDEX_DEFINITION = {
   name: BOOK_EMBEDDING_CONFIG.SEARCH_INDEX_NAME,

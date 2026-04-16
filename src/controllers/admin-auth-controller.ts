@@ -1,23 +1,21 @@
 import type { Request, Response, NextFunction } from "express";
 import jwt from "jsonwebtoken";
 import bcrypt from "bcryptjs";
-import NhanVien from "../models/NhanVien.ts";
+import NhanVien from "../models/NhanVien";
 import { Error } from "mongoose";
-import { JWT_SECRET, JWT_EXPIRES } from "../config/env.ts";
+import { JWT_SECRET, JWT_EXPIRES } from "../config/env";
+import blackListController from "./black-list-controller";
 
 import {
   formatUserResponse,
   createSuccessResponse,
   createErrorResponse,
   generateSuccessResponse,
-} from "../utils/response.ts";
+} from "../utils/response";
 
-import type {
-  StaffJWTPayload,
-  LoginRequest,
-  StaffRegisterRequest,
-} from "../types/request.ts";
-import type { INhanVienWithId } from "../types/nhan-vien.ts";
+import type { StaffJWTPayload, LoginRequest, StaffRegisterRequest } from "../types/request";
+import type { INhanVienWithId } from "../types/nhan-vien";
+import getToken from "../services/get-token.service";
 
 interface MongooseValidationError extends Error {
   name: "ValidationError";
@@ -37,7 +35,7 @@ const signUser = (user: INhanVienWithId): string => {
     email: user.email,
     fullname: user.fullname,
   };
-  
+
   return jwt.sign(payload, JWT_SECRET, { expiresIn: "1 day" });
 };
 
@@ -50,7 +48,7 @@ class AdminAuthController {
           createErrorResponse({
             message: "Email is required",
             statusCode: 400,
-          })
+          }),
         );
       }
 
@@ -62,7 +60,7 @@ class AdminAuthController {
           createErrorResponse({
             message: "Email does not exist",
             statusCode: code,
-          })
+          }),
         );
       }
 
@@ -73,7 +71,7 @@ class AdminAuthController {
           createErrorResponse({
             message: "Password is not correct",
             statusCode: code,
-          })
+          }),
         );
       }
 
@@ -88,14 +86,14 @@ class AdminAuthController {
             accessToken: token,
             user: userResponse,
           },
-        })
+        }),
       );
     } catch (error) {
       next(error);
       return res.json(
         createErrorResponse({
           message: "Fail to login. Something went wrong.",
-        })
+        }),
       );
     }
   }
@@ -131,7 +129,7 @@ class AdminAuthController {
             access_token: token,
             user: userResponse,
           },
-        })
+        }),
       );
     } catch (error: unknown) {
       console.error("Register error:", error);
@@ -162,7 +160,7 @@ class AdminAuthController {
               errors: validationErrors,
               errorMessages,
             },
-          })
+          }),
         );
       }
 
@@ -176,7 +174,7 @@ class AdminAuthController {
                 ? (error as Error)?.message
                 : "Something went wrong",
           },
-        })
+        }),
       );
     }
   }
@@ -189,7 +187,7 @@ class AdminAuthController {
           createErrorResponse({
             message: "User not found",
             statusCode: 404,
-          })
+          }),
         );
       }
 
@@ -199,18 +197,26 @@ class AdminAuthController {
           data: {
             user,
           },
-        })
+        }),
       );
     } catch (error) {
       return res.status(500).json(
         createErrorResponse({
           message: "Fail to get user. Something went wrong.",
-        })
+        }),
       );
     }
   }
 
-  logout(req: Request, res: Response, next: NextFunction) {
+  async logout(req: Request, res: Response, next: NextFunction) {
+    const token = getToken(req);
+    console.log("Logging out token:", token);
+    if (token) {
+      await blackListController.addToBlacklist(token);
+    }
+
+    res.clearCookie("token");
+
     return res.status(200).json({ message: "Đăng xuất thành công." });
   }
 }

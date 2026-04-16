@@ -1,8 +1,8 @@
 import mongoose, { Document, Schema } from "mongoose";
 import bcrypt from "bcryptjs";
 
-import type { IDocGia } from "../types/doc-gia.ts";
-import { normalizeVietnamese } from "../utils/normalize-vietnamese.ts";
+import type { IDocGia } from "../types/doc-gia";
+import { normalizeVietnamese } from "../utils/normalize-vietnamese";
 
 const DocGiaSchema = new Schema<IDocGia>(
   {

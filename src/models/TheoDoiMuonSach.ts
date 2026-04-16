@@ -1,5 +1,5 @@
 import mongoose from "mongoose";
-import type { TheoDoiMuonSach } from "../types/theo-doi-muon-sach.ts";
+import type { TheoDoiMuonSach } from "../types/theo-doi-muon-sach";
 
 const TheoDoiMuonSachSchema = new mongoose.Schema<TheoDoiMuonSach>(
   {

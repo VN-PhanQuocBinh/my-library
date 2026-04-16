@@ -1,4 +1,4 @@
-import Sach from "../models/Sach.ts";
+import Sach from "../models/Sach";
 
 // Colors for console
 const colors = {

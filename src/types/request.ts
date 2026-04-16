@@ -1,6 +1,6 @@
 import type { Request } from "express";
-import type { IDocGia } from "./doc-gia.ts";
-import type { INhanVien } from "./nhan-vien.ts";
+import type { IDocGia } from "./doc-gia";
+import type { INhanVien } from "./nhan-vien";
 
 interface BaseJWTPayload {
   sub: string;
