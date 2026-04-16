@@ -1,7 +1,7 @@
 import mongoose, { Schema } from "mongoose";
 import bcrypt from "bcryptjs";
-import type { INhanVien } from "../types/nhan-vien.ts";
-import { normalizeVietnamese } from "../utils/normalize-vietnamese.ts";
+import type { INhanVien } from "../types/nhan-vien";
+import { normalizeVietnamese } from "../utils/normalize-vietnamese";
 
 const NhanVienSchema = new Schema<INhanVien>(
   {

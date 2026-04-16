@@ -1,6 +1,6 @@
 import { GoogleGenAI } from "@google/genai";
-import type { EmbeddingModelType } from "../config/config.ts";
-import embeddingModels from "./embedding.service.ts";
+import type { EmbeddingModelType } from "../config/config";
+import embeddingModels from "./embedding.service";
 
 import { InferenceClient } from "@huggingface/inference";
 

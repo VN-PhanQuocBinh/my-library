@@ -1,12 +1,12 @@
-import NhaXuatBan from "../models/NhaXuatBan.ts";
+import NhaXuatBan from "../models/NhaXuatBan";
 import type { Request, Response } from "express";
-import type { INhaXuatBan } from "../types/nha-xuat-ban.ts";
-import pagnigate from "../utils/paginate.ts";
+import type { INhaXuatBan } from "../types/nha-xuat-ban";
+import pagnigate from "../utils/paginate";
 
 import {
   generateSuccessResponse,
   generateErrorResponse,
-} from "../utils/response.ts";
+} from "../utils/response";
 
 interface PublisherRequest extends Request {
   body: Pick<INhaXuatBan, "name" | "address">;

@@ -1,31 +1,33 @@
 import type { Request, Response } from "express";
-import Sach from "./src/models/Sach.ts";
+import Sach from "./models/Sach";
 
 import express from "express";
 import cors from "cors";
-import routes from "./src/routes/index.ts";
+import routes from "./routes/index";
 
 // scripts
-import generateEmbeddings from "./src/scripts/generate-embeddings.ts";
-import removeEmbeddings from "./src/scripts/remove-embeddings.ts";
-
-
+import generateEmbeddings from "./scripts/generate-embeddings";
+import removeEmbeddings from "./scripts/remove-embeddings";
 
 // connect to database
-import db from "./src/config/db.ts";
+import db from "./config/db";
 db.connect();
-// Sach.createVectorSearchIndex(); 
+// Sach.createVectorSearchIndex();
 // Sach.dropVectorSearchIndex()
-
 
 const PORT = process.env.PORT || 5000;
 
 const app = express();
 
 // enable CORS
+const allowedOrigins = ["http://localhost:3000", "http://localhost:5173", process.env.FRONTEND_URL].filter(
+  Boolean,
+) as string[];
+
 app.use(
   cors({
-    origin: ["http://localhost:5173", "http://localhost:3002"],
+    origin: allowedOrigins,
+    credentials: true,
     // origin: function (origin, callback) {
     //   console.log("Origin:", origin);
     //   const allowedOrigins = ["http://localhost:5173", "http://localhost:3002"];
@@ -35,7 +37,7 @@ app.use(
     //     callback(new Error("Not allowed by CORS"));
     //   }
     // },
-  })
+  }),
 );
 
 // Parse URL-encoded bodies (as sent by HTML forms)
@@ -47,7 +49,6 @@ app.use(express.urlencoded({ extended: true }));
 routes(app);
 
 app.get("/", (req: Request, res: Response) => res.send("API is running..."));
-
 
 // Run scripts
 // generateEmbeddings()

@@ -1,5 +1,5 @@
-import type { Gender } from "./common.ts";
-import type { PenaltyRecord } from "../types/doc-gia.ts";
+import type { Gender } from "./common";
+import type { PenaltyRecord } from "../types/doc-gia";
 
 export interface SuccessResponse<T = any> {
   status: "success";

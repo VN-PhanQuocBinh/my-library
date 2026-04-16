@@ -1,7 +1,7 @@
 import mongoose from "mongoose";
-import Sach from "./Sach.ts";
-import type { ISach } from "../types/sach.ts";
-import type { IMessage } from "../types/conversation.ts";
+import Sach from "./Sach";
+import type { ISach } from "../types/sach";
+import type { IMessage } from "../types/conversation";
 
 const messageSchema = new mongoose.Schema<IMessage>(
   {

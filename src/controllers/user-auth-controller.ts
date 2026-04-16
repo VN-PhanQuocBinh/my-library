@@ -1,24 +1,24 @@
 import type { Request, Response, NextFunction } from "express";
 import jwt from "jsonwebtoken";
 import bcrypt from "bcryptjs";
-import DocGia from "../models/DocGia.ts";
-import type { IDocGiaWithId } from "../types/doc-gia.ts";
+import DocGia from "../models/DocGia";
+import type { IDocGiaWithId } from "../types/doc-gia";
 import { Error } from "mongoose";
-import { JWT_SECRET, JWT_EXPIRES } from "../config/env.ts";
-import blackListController from "./black-list-controller.ts";
-import getToken from "../services/get-token.service.ts";
+import { JWT_SECRET, JWT_EXPIRES } from "../config/env";
+import blackListController from "./black-list-controller";
+import getToken from "../services/get-token.service";
 
 import {
   formatUserResponse,
   createSuccessResponse,
   createErrorResponse,
-} from "../utils/response.ts";
+} from "../utils/response";
 
 import type {
   ReaderJWTPayload,
   LoginRequest,
   ReaderRegisterRequest,
-} from "../types/request.ts";
+} from "../types/request";
 
 interface MongooseValidationError extends Error {
   name: "ValidationError";

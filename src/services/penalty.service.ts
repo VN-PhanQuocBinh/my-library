@@ -1,8 +1,8 @@
-import DocGia from "../models/DocGia.ts";
-import type { IDocGia, PenaltyRecord } from "../types/doc-gia.ts";
+import DocGia from "../models/DocGia";
+import type { IDocGia, PenaltyRecord } from "../types/doc-gia";
 
-import TheoDoiMuonSach from "../models/TheoDoiMuonSach.ts";
-import type { TheoDoiMuonSach as ITheoDoiMuonSach } from "../types/theo-doi-muon-sach.ts";
+import TheoDoiMuonSach from "../models/TheoDoiMuonSach";
+import type { TheoDoiMuonSach as ITheoDoiMuonSach } from "../types/theo-doi-muon-sach";
 import mongoose, { Types } from "mongoose";
 
 const FINE_PER_DAY = 5000;

@@ -1,10 +1,10 @@
 import mongoose from "mongoose";
-import Sach from "../models/Sach.ts";
-import type { ISach } from "../types/sach.ts";
+import Sach from "../models/Sach";
+import type { ISach } from "../types/sach";
 
-import aiController from "../controllers/ai-controller.ts";
-import paginate from "../utils/paginate.ts";
-import { generateEmbeddingWithHuggingFace } from "../services/ai.service.ts";
+import aiController from "../controllers/ai-controller";
+import paginate from "../utils/paginate";
+import { generateEmbeddingWithHuggingFace } from "../services/ai.service";
 
 // Colors for console
 const colors = {

@@ -1,7 +1,7 @@
 import type { NextFunction, RequestHandler, Request, Response } from "express";
-import { createErrorResponse } from "../utils/response.ts";
+import { createErrorResponse } from "../utils/response";
 
-import type { UserRole } from "../types/common.ts";
+import type { UserRole } from "../types/common";
 
 export default function requireRole(roles: UserRole[]): RequestHandler | void {
   try {

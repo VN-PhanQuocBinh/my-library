@@ -1,5 +1,5 @@
-import DocGia from "../models/DocGia.ts";
-import paginate from "../utils/paginate.ts";
+import DocGia from "../models/DocGia";
+import paginate from "../utils/paginate";
 import bcrypt from "bcryptjs";
 
 import type { Response, Request } from "express";
@@ -7,9 +7,9 @@ import type { Response, Request } from "express";
 import {
   generateErrorResponse,
   generateSuccessResponse,
-} from "../utils/response.ts";
+} from "../utils/response";
 
-import { createSearchOptions } from "../utils/create-search-options.ts";
+import { createSearchOptions } from "../utils/create-search-options";
 
 interface MongooseValidationError extends Error {
   name: "ValidationError";

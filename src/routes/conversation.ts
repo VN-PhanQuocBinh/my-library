@@ -1,8 +1,8 @@
 import express from "express";
-import ConversationController from "../controllers/conversation-controller.ts";
-import requireAuth from "../middleware/require-auth.ts";
-import requireRole from "../middleware/require-role.ts";
-import checkStatusMiddleware from "../middleware/check-status.ts";
+import ConversationController from "../controllers/conversation-controller";
+import requireAuth from "../middleware/require-auth";
+import requireRole from "../middleware/require-role";
+import checkStatusMiddleware from "../middleware/check-status";
 
 const router = express.Router();
 

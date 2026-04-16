@@ -1,4 +1,4 @@
-import aiController from "../controllers/ai-controller.ts";
+import aiController from "../controllers/ai-controller";
 import express from "express";
 const router = express.Router();
 
