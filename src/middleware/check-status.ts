@@ -1,7 +1,7 @@
 import type { Request, Response } from "express";
-import { createErrorResponse } from "../utils/response.ts";
-import type { INhanVienWithId } from "../types/user-schema.ts";
-import type { IDocGiaWithId } from "../types/doc-gia.ts";
+import { createErrorResponse } from "../utils/response";
+import type { INhanVienWithId } from "../types/user-schema";
+import type { IDocGiaWithId } from "../types/doc-gia";
 
 export default async function checkStatusMiddleware(
   req: Request & {

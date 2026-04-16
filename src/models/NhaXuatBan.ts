@@ -1,6 +1,6 @@
 import mongoose from "mongoose";
-import type { INhaXuatBan } from "../types/nha-xuat-ban.ts";
-import { normalizeVietnamese } from "../utils/normalize-vietnamese.ts";
+import type { INhaXuatBan } from "../types/nha-xuat-ban";
+import { normalizeVietnamese } from "../utils/normalize-vietnamese";
 
 const nhaXuatBanSchema = new mongoose.Schema<INhaXuatBan>({
   name: {

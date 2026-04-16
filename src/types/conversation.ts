@@ -1,5 +1,5 @@
 import type { mongo } from "mongoose";
-import type { ISach } from "./sach.ts";
+import type { ISach } from "./sach";
 
 export interface IMessage {
   _id?: string;

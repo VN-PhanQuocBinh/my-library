@@ -1,11 +1,11 @@
-import Conversation from "../models/Conversation.ts";
-import Message from "../models/Message.ts";
-import Sach from "../models/Sach.ts";
-import aiController from "./ai-controller.ts";
+import Conversation from "../models/Conversation";
+import Message from "../models/Message";
+import Sach from "../models/Sach";
+import aiController from "./ai-controller";
 import type { Request, Response } from "express";
-import { createSuccessResponse, createErrorResponse } from "../utils/response.ts";
-import { BOOK_EMBEDDING_CONFIG } from "../config/config.ts";
-import { SUGGESTION_PROMPT, LIBRARY_FAQ_CONTENT } from "../data/system-prompt.ts";
+import { createSuccessResponse, createErrorResponse } from "../utils/response";
+import { BOOK_EMBEDDING_CONFIG } from "../config/config";
+import { SUGGESTION_PROMPT, LIBRARY_FAQ_CONTENT } from "../data/system-prompt";
 import { set } from "mongoose";
 
 const MAX_MESSAGE_HISTORY = 10;

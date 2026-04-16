@@ -1,6 +1,6 @@
-import type { IDocGiaWithId } from "./doc-gia.ts";
-import type { INhanVienWithId } from "./user-schema.ts";
-import type { UserRole } from "./common.ts";
+import type { IDocGiaWithId } from "./doc-gia";
+import type { INhanVienWithId } from "./user-schema";
+import type { UserRole } from "./common";
 
 declare global {
   namespace Express {

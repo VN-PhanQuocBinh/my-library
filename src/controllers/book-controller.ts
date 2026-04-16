@@ -1,18 +1,18 @@
-import Sach from "../models/Sach.ts";
-import NhaXuatBan from "../models/NhaXuatBan.ts";
+import Sach from "../models/Sach";
+import NhaXuatBan from "../models/NhaXuatBan";
 import type { Request, Response } from "express";
 import multer, { type Multer } from "multer";
-import { uploadImages, deleteImages } from "../utils/image-cloud-service.ts";
-import { IMAGE_UPLOAD_PATH } from "../config/config.ts";
-import { createSearchOptions } from "../utils/create-search-options.ts";
+import { uploadImages, deleteImages } from "../utils/image-cloud-service";
+import { IMAGE_UPLOAD_PATH } from "../config/config";
+import { createSearchOptions } from "../utils/create-search-options";
 
 import {
   generateErrorResponse,
   generateSuccessResponse,
-} from "../utils/response.ts";
+} from "../utils/response";
 
-import type { ISach, ImageInfo } from "../types/sach.ts";
-import pagnigate from "../utils/paginate.ts";
+import type { ISach, ImageInfo } from "../types/sach";
+import pagnigate from "../utils/paginate";
 
 interface BookCreateRequest extends Request {
   body: Partial<ISach>;

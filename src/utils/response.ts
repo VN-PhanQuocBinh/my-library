@@ -1,7 +1,7 @@
 import type { ObjectId } from "mongoose";
-import type { Gender } from "../types/common.ts";
-import type { IDocGia, IDocGiaWithId } from "../types/doc-gia.ts";
-import type { UserResponse } from "../types/response.ts";
+import type { Gender } from "../types/common";
+import type { IDocGia, IDocGiaWithId } from "../types/doc-gia";
+import type { UserResponse } from "../types/response";
 
 interface ResponseProps {
   message: string;

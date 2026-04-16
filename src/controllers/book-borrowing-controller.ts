@@ -1,18 +1,18 @@
-import TheoDoiMuonSach from "../models/TheoDoiMuonSach.ts";
-import type { TheoDoiMuonSach as ITheoDoiMuonSach } from "../types/theo-doi-muon-sach.ts";
-import DocGia from "../models/DocGia.ts";
-import Sach from "../models/Sach.ts";
-import type { borrowingStatus } from "../types/theo-doi-muon-sach.ts";
+import TheoDoiMuonSach from "../models/TheoDoiMuonSach";
+import type { TheoDoiMuonSach as ITheoDoiMuonSach } from "../types/theo-doi-muon-sach";
+import DocGia from "../models/DocGia";
+import Sach from "../models/Sach";
+import type { borrowingStatus } from "../types/theo-doi-muon-sach";
 
 import type { Request, Response } from "express";
-import paginate from "../utils/paginate.ts";
+import paginate from "../utils/paginate";
 
 import {
   generateErrorResponse,
   generateSuccessResponse,
-} from "../utils/response.ts";
+} from "../utils/response";
 
-import { PenaltyService } from "../services/penalty.service.ts";
+import { PenaltyService } from "../services/penalty.service";
 import mongoose from "mongoose";
 
 const MAX_BOOK_BORROW = 5;

@@ -1,4 +1,4 @@
-import Blacklist from "../models/Blacklist.ts";
+import Blacklist from "../models/Blacklist";
 import jwt from "jsonwebtoken";
 
 class BlacklistService {
@@ -30,6 +30,7 @@ class BlacklistService {
 
   async isBlacklisted(token: string): Promise<boolean> {
     const blacklistedToken = await Blacklist.findOne({ token });
+    console.log("Blacklist check for token:", token, "Result:", blacklistedToken);
     return !!blacklistedToken;
   }
 

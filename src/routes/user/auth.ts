@@ -1,9 +1,9 @@
 import express from "express";
 
 const router = express.Router();
-import requireAuth from "../../middleware/require-auth.ts";
+import requireAuth from "../../middleware/require-auth";
 
-import readerAuthController from "../../controllers/user-auth-controller.ts";
+import readerAuthController from "../../controllers/user-auth-controller";
 
 router.post("/register", readerAuthController.register);
 router.post("/login", readerAuthController.login);

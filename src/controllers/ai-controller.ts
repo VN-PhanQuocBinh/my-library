@@ -3,12 +3,12 @@ import {
   generateSentenceSimilarity,
   generateChatResponse,
   generateChatResponseV2,
-} from "../services/ai.service.ts";
+} from "../services/ai.service";
 
-import type { IMessage } from "../types/conversation.ts";
-import type { ChatHistory } from "../services/ai.service.ts";
+import type { IMessage } from "../types/conversation";
+import type { ChatHistory } from "../services/ai.service";
 
-import { SYSTEM_PROMPT } from "../data/system-prompt.ts";
+import { SYSTEM_PROMPT } from "../data/system-prompt";
 
 class AIController {
   // Generate embedding for a given prompt

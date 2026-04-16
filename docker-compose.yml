@@ -1,0 +1,11 @@
+version: "3.8"
+
+services:
+  app:
+    build: .
+    image: my-library-backend:0.0.1
+    container_name: my-library-backend
+    ports:
+      - "3001:3001"
+    env_file:
+      - .env
