@@ -152,7 +152,7 @@ class ConversationController {
                 path: BOOK_EMBEDDING_CONFIG.PATH,
                 numCandidates: BOOK_EMBEDDING_CONFIG.NUMBER_CANDIDATES, // The number of candidates to consider for vector search
                 limit: BOOK_EMBEDDING_CONFIG.LIMIT, // The number of results to return
-              },
+              }, 
             },
 
             // Optionally, project the fields you want to return
@@ -182,6 +182,7 @@ class ConversationController {
           });
 
           rankedBooks = rankedBooks.sort((a: any, b: any) => b.score - a.score);
+
           const contextData = rankedBooks
             .map(
               (book, index) =>
