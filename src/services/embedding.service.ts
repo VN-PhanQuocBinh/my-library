@@ -14,7 +14,7 @@ const embeddingModels: Record<
       async function query(data: any) {
         const response = await fetch(embeddingModelsLink[1] as string, {
           headers: {
-            Authorization: `Bearer ${process.env.HF_TOKEN}`,
+            Authorization: `Bearer ${process.env.HF_API_KEY}`,
             "Content-Type": "application/json",
           },
           method: "POST",
@@ -41,7 +41,7 @@ const embeddingModels: Record<
       async function query(data: any) {
         const response = await fetch(embeddingModelsLink[0] as string, {
           headers: {
-            Authorization: `Bearer ${process.env.HF_TOKEN}`,
+            Authorization: `Bearer ${process.env.HF_API_KEY}`,
             "Content-Type": "application/json",
           },
           method: "POST",
@@ -55,7 +55,7 @@ const embeddingModels: Record<
         inputs: prompt,
       });
 
-      console.log("Embedding output:", output.length);
+      console.log("Embedding output:", output);
       return output;
     } catch (error) {
       throw error;
@@ -68,7 +68,7 @@ const embeddingModels: Record<
           "https://router.huggingface.co/hf-inference/models/dangvantuan/vietnamese-embedding/pipeline/sentence-similarity",
           {
             headers: {
-              Authorization: `Bearer ${process.env.HF_TOKEN}`,
+              Authorization: `Bearer ${process.env.HF_API_KEY}`,
               "Content-Type": "application/json",
             },
             method: "POST",

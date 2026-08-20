@@ -6,9 +6,8 @@ import { InferenceClient } from "@huggingface/inference";
 
 import dotenv from "dotenv";
 dotenv.config();
-// console.log("HF Token:", process.env.HF_TOKEN);
 
-const client = new InferenceClient(process.env.HF_TOKEN);
+const client = new InferenceClient(process.env.HF_API_KEY);
 
 const CURRENT_EMBEDDING_MODEL: EmbeddingModelType = "E5Large";
 const TEXT_MODEL = "gemini-2.5-flash-lite"; // or "gemini-2.5-flash" -> restart server after change
